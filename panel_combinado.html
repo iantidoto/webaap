@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel Combinado – Gestión Profesional</title>
   <style>
-    /* Aquí van los estilos combinados del primer archivo */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       margin: 0;
       padding: 0;
       color: #222;
     }
+
     .header {
       background: #fff;
       padding: 16px 20px;
@@ -22,24 +22,97 @@
       align-items: center;
       flex-wrap: wrap;
     }
+
     .header h1 {
       font-size: 20px;
       color: #1e3c72;
     }
+
     .container {
       max-width: 1200px;
       margin: 20px auto;
       padding: 0 16px;
     }
-    /* Puedes seguir añadiendo más estilos aquí según lo que quieras mostrar */
+
+    .panel {
+      background: #fff;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      color: #2a5298;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      width: 70%;
+      margin-right: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 8px 12px;
+      background-color: #2a5298;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e3c72;
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>🧠 Panel Combinado – Gestión Profesional</h1>
   </div>
+
   <div class="container">
-    <!-- Aquí insertaremos los paneles funcionales -->
+    <div class="panel">
+      <h2>📁 Proyectos</h2>
+      <input type="text" id="nuevoProyecto" placeholder="Añadir nuevo proyecto..." />
+      <button onclick="agregarProyecto()">➕ Añadir</button>
+      <ul id="listaProyectos"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>✅ Tareas</h2>
+      <input type="text" id="nuevaTarea" placeholder="Añadir nueva tarea..." />
+      <button onclick="agregarTarea()">➕ Añadir</button>
+      <ul id="listaTareas"></ul>
+    </div>
   </div>
+
+  <script>
+    const listaProyectos = document.getElementById("listaProyectos");
+    const listaTareas = document.getElementById("listaTareas");
+
+    function agregarProyecto() {
+      const input = document.getElementById("nuevoProyecto");
+      if (input.value.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = input.value;
+        listaProyectos.appendChild(li);
+        input.value = "";
+      }
+    }
+
+    function agregarTarea() {
+      const input = document.getElementById("nuevaTarea");
+      if (input.value.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = input.value;
+        listaTareas.appendChild(li);
+        input.value = "";
+      }
+    }
+  </script>
 </body>
 </html>

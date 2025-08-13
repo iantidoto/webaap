@@ -1,25 +1,217 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0; URL='panel_combinado.html'" />
-    <title>Redirigiendo...</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        background-color: #f0f0f0;
-        text-align: center;
-        padding-top: 50px;
-        color: #333;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestión Profesional TIC</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+
+    .header {
+      background: #fff;
+      padding: 16px 20px;
+      border-bottom: 2px solid #2a5298;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      color: #1e3c72;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .panel {
+      background: #fff;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      color: #2a5298;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .controls button {
+      padding: 8px 12px;
+      background-color: #2a5298;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background-color: #1e3c72;
+    }
+
+    input[type="text"], select {
+      padding: 8px;
+      width: 70%;
+      margin-right: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    ul li {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .timer {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2a5298;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎓💻 Gestión Profesional TIC</h1>
+  </div>
+
+  <div class="container">
+    <div class="panel">
+      <h2>⏱️ Temporizador</h2>
+      <div class="timer" id="temporizador">00:00:00</div>
+      <div class="controls">
+        <button onclick="iniciarTemporizador()">▶️ Iniciar</button>
+        <button onclick="resetTemporizador()">🔄 Reset</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📁 Proyecto actual</h2>
+      <select id="selectorProyecto">
+        <option value="">Selecciona un proyecto</option>
+        <option value="WebApp">WebApp</option>
+        <option value="Tesis">Tesis</option>
+        <option value="Portfolio">Portfolio</option>
+      </select>
+    </div>
+
+    <div class="panel">
+      <h2>💻 Proyectos Web</h2>
+      <input type="text" id="nuevoProyecto" placeholder="Añadir nuevo proyecto..." />
+      <button onclick="agregarProyecto()">➕ Añadir</button>
+      <ul id="listaProyectos"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>📋 Tareas</h2>
+      <input type="text" id="nuevaTarea" placeholder="Añadir nueva tarea..." />
+      <button onclick="agregarTarea()">➕ Añadir</button>
+      <ul id="listaTareas"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>📅 Horarios</h2>
+      <input type="text" id="nuevoHorario" placeholder="Añadir horario..." />
+      <button onclick="agregarHorario()">➕ Añadir</button>
+      <ul id="listaHorarios"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>📊 Estadísticas y Productividad</h2>
+      <p>Proyectos activos: <span id="statsProyectos">0</span></p>
+      <p>Tareas pendientes: <span id="statsTareas">0</span></p>
+    </div>
+  </div>
+
+  <script>
+    let segundos = 0;
+    let temporizadorActivo = false;
+    let intervalo;
+
+    function iniciarTemporizador() {
+      if (!temporizadorActivo) {
+        temporizadorActivo = true;
+        intervalo = setInterval(() => {
+          segundos++;
+          document.getElementById("temporizador").textContent = formatearTiempo(segundos);
+        }, 1000);
       }
-      a {
-        color: #2a5298;
-        text-decoration: none;
-        font-weight: bold;
+    }
+
+    function resetTemporizador() {
+      clearInterval(intervalo);
+      temporizadorActivo = false;
+      segundos = 0;
+      document.getElementById("temporizador").textContent = "00:00:00";
+    }
+
+    function formatearTiempo(s) {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    }
+
+    function agregarProyecto() {
+      const input = document.getElementById("nuevoProyecto");
+      if (input.value.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = input.value;
+        document.getElementById("listaProyectos").appendChild(li);
+        input.value = "";
+        actualizarEstadisticas();
       }
-    </style>
-  </head>
-  <body>
-    <p>Redirigiendo a <a href="panel_combinado.html">panel_combinado.html</a>...</p>
-  </body>
+    }
+
+    function agregarTarea() {
+      const input = document.getElementById("nuevaTarea");
+      if (input.value.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = input.value;
+        document.getElementById("listaTareas").appendChild(li);
+        input.value = "";
+        actualizarEstadisticas();
+      }
+    }
+
+    function agregarHorario() {
+      const input = document.getElementById("nuevoHorario");
+      if (input.value.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = input.value;
+        document.getElementById("listaHorarios").appendChild(li);
+        input.value = "";
+      }
+    }
+
+    function actualizarEstadisticas() {
+      const proyectos = document.querySelectorAll("#listaProyectos li").length;
+      const tareas = document.querySelectorAll("#listaTareas li").length;
+      document.getElementById("statsProyectos").textContent = proyectos;
+      document.getElementById("statsTareas").textContent = tareas;
+    }
+  </script>
+</body>
 </html>

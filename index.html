@@ -4,16 +4,93 @@
   <meta charset="UTF-8" />
   <title>Gestor Profesional TIC</title>
   <style>
-    body { font-family: sans-serif; margin: 20px; background: #f4f4f4; }
-    h1 { color: #2a5298; }
-    section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    input, select, button { margin: 5px; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 5px 0; }
-    button { cursor: pointer; background: #2a5298; color: white; border: none; }
-    button:hover { background: #1e3c72; }
-    .inline { display: inline-block; }
-  </style>
+  :root {
+    --color-primario: #2a5298;
+    --color-fondo: #f4f4f4;
+    --color-blanco: #ffffff;
+    --sombra: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--color-fondo);
+    color: #333;
+  }
+
+  h1 {
+    color: var(--color-primario);
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  section {
+    background: var(--color-blanco);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: var(--sombra);
+  }
+
+  input, select, button {
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 16px;
+  }
+
+  button {
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: #1e3c72;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    margin: 8px 0;
+    padding: 10px;
+    background: #e9ecf3;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  li span {
+    flex-grow: 1;
+  }
+
+  li button {
+    margin-left: 10px;
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  @media (min-width: 600px) {
+    input, select, button {
+      width: auto;
+      display: inline-block;
+    }
+  }
+</style>
+
 </head>
 <body>
   <h1>🎓💻 Gestor Profesional TIC</h1>

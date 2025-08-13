@@ -104,6 +104,31 @@
       }
     }
 
+    function mostrarListaProyectos() {
+      const lista = document.getElementById("listaProyectos");
+      lista.innerHTML = "";
+      Object.keys(proyectos).forEach(nombre => {
+        const li = crearElemento(
+          nombre,
+          nuevoNombre => {
+            proyectos[nuevoNombre] = proyectos[nombre];
+            delete proyectos[nombre];
+            actualizarSelectorProyectos();
+            mostrarListaProyectos();
+            guardarDatos();
+          },
+          () => {
+            delete proyectos[nombre];
+            actualizarSelectorProyectos();
+            mostrarListaProyectos();
+            guardarDatos();
+            actualizarEstadisticas();
+          }
+        );
+        lista.appendChild(li);
+      });
+    }
+
     function actualizarSelectorProyectos() {
       const selector = document.getElementById("selectorProyecto");
       selector.innerHTML = '<option disabled selected>Selecciona un proyecto</option>';
@@ -113,6 +138,7 @@
         option.textContent = nombre;
         selector.appendChild(option);
       });
+      mostrarListaProyectos();
     }
 
     function mostrarTareasProyecto() {
@@ -223,32 +249,30 @@
       localStorage.setItem("horariosData", JSON.stringify(horarios));
     }
 
-       function cargarDatos() {
-      proyectos = JSON.parse(localStorage.getItem("proyectosData")) || {};
-      agenda = JSON.parse(localStorage.getItem("agendaData")) || [];
-      const horarios = JSON.parse(localStorage.getItem("horariosData")) || [];
-      horarios.forEach(texto => {
-        const li = crearElemento(
-          texto,
-          nuevoTexto => {
-            li.querySelector("span").textContent = nuevoTexto;
-            guardarDatos();
-          },
-          () => {
-            li.remove();
-            guardarDatos();
-            actualizarEstadisticas();
-          }
-        );
-        document.getElementById("listaHorarios").appendChild(li);
-      });
+   function cargarDatos() {
+  proyectos = JSON.parse(localStorage.getItem("proyectosData")) || {};
+  agenda = JSON.parse(localStorage.getItem("agendaData")) || [];
+  const horarios = JSON.parse(localStorage.getItem("horariosData")) || [];
 
-      actualizarSelectorProyectos();
-      mostrarAgenda();
-      actualizarEstadisticas();
-    }
+  horarios.forEach(texto => {
+    const li = crearElemento(
+      texto,
+      nuevoTexto => {
+        li.querySelector("span").textContent = nuevoTexto;
+        guardarDatos();
+      },
+      () => {
+        li.remove();
+        guardarDatos();
+        actualizarEstadisticas();
+      }
+    );
+    document.getElementById("listaHorarios").appendChild(li);
+  });
 
-    window.onload = cargarDatos;
-  </script>
-</body>
-</html>
+  actualizarSelectorProyectos();
+  mostrarAgenda();
+  actualizarEstadisticas();
+}
+
+window.onload = cargarDatos;

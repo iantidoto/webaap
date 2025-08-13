@@ -212,6 +212,59 @@
       document.getElementById("statsProyectos").textContent = proyectos;
       document.getElementById("statsTareas").textContent = tareas;
     }
-  </script>
+
+    <script>
+function guardarDatos() {
+  localStorage.setItem("proyectos", document.getElementById("listaProyectos").innerHTML);
+  localStorage.setItem("tareas", document.getElementById("listaTareas").innerHTML);
+  localStorage.setItem("horarios", document.getElementById("listaHorarios").innerHTML);
+}
+
+function cargarDatos() {
+  document.getElementById("listaProyectos").innerHTML = localStorage.getItem("proyectos") || "";
+  document.getElementById("listaTareas").innerHTML = localStorage.getItem("tareas") || "";
+  document.getElementById("listaHorarios").innerHTML = localStorage.getItem("horarios") || "";
+  actualizarEstadisticas();
+}
+
+// Llamar al cargar la página
+window.onload = cargarDatos;
+
+// Modifica las funciones existentes para guardar después de añadir
+function agregarProyecto() {
+  const input = document.getElementById("nuevoProyecto");
+  if (input.value.trim() !== "") {
+    const li = document.createElement("li");
+    li.textContent = input.value;
+    document.getElementById("listaProyectos").appendChild(li);
+    input.value = "";
+    actualizarEstadisticas();
+    guardarDatos();
+  }
+}
+
+function agregarTarea() {
+  const input = document.getElementById("nuevaTarea");
+  if (input.value.trim() !== "") {
+    const li = document.createElement("li");
+    li.textContent = input.value;
+    document.getElementById("listaTareas").appendChild(li);
+    input.value = "";
+    actualizarEstadisticas();
+    guardarDatos();
+  }
+}
+
+function agregarHorario() {
+  const input = document.getElementById("nuevoHorario");
+  if (input.value.trim() !== "") {
+    const li = document.createElement("li");
+    li.textContent = input.value;
+    document.getElementById("listaHorarios").appendChild(li);
+    input.value = "";
+    guardarDatos();
+  }
+}
+      </script>
 </body>
 </html>

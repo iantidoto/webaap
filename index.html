@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor Profesional TIC</title>
-
   <!-- Iconos Phosphor -->
   <script src="https://unpkg.com/phosphor-icons"></script>
-
   <style>
     :root {
       --color-primario: #4A90E2;
@@ -16,13 +14,11 @@
       --color-texto: #2E2E2E;
       --color-borde: #E0E0E0;
       --color-hover: #357ABD;
-      --sombra: 0 2px 6px rgba(0,0,0,0.05);
+      --sombra: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
-
     * {
       box-sizing: border-box;
     }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
       margin: 0;
@@ -30,14 +26,12 @@
       background: var(--color-fondo);
       color: var(--color-texto);
     }
-
     h1 {
       color: var(--color-primario);
       text-align: center;
       margin-bottom: 30px;
       font-size: 28px;
     }
-
     section {
       background: var(--color-blanco);
       padding: 20px;
@@ -45,7 +39,6 @@
       border-radius: 12px;
       box-shadow: var(--sombra);
     }
-
     input, select, button, textarea {
       margin: 8px 0;
       padding: 10px;
@@ -56,108 +49,284 @@
       background-color: #fff;
       color: var(--color-texto);
     }
-
     button {
       background: var(--color-primario);
       color: white;
       border: none;
-      font-weight: 500;
-      transition: background 0.3s ease;
       cursor: pointer;
     }
-
     button:hover {
       background: var(--color-hover);
     }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      margin: 8px 0;
-      padding: 12px;
-      background: #eef1f7;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: box-shadow 0.2s ease;
-    }
-
-    li:hover {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    li span {
-      flex-grow: 1;
-      font-size: 15px;
-    }
-
-    li button {
-      margin-left: 10px;
-      padding: 6px 10px;
-      font-size: 14px;
-    }
-
     .icon {
       font-size: 18px;
       vertical-align: middle;
-      margin-right: 6px;
     }
-
-    @media (min-width: 600px) {
-      input, select, button {
-        width: auto;
-        display: inline-block;
-      }
+    #estadisticas {
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1><i class="ph ph-graduation-cap icon"></i> Gestor Profesional TIC</h1>
+  <h1>Gestor Profesional TIC</h1>
 
   <section>
-    <h2><i class="ph ph-folder icon"></i> Proyectos</h2>
-    <input id="nuevoProyecto" placeholder="Nuevo proyecto" />
-    <button onclick="agregarProyecto()"><i class="ph ph-plus icon"></i> Añadir</button>
-    <select id="selectorProyecto" onchange="mostrarTareasProyecto()">
-      <option disabled selected>Selecciona un proyecto</option>
-    </select>
+    <h2>📁 Proyectos</h2>
+    <input type="text" id="nuevoProyecto" placeholder="Nuevo proyecto" />
+    <button onclick="agregarProyecto()">Agregar Proyecto</button>
     <ul id="listaProyectos"></ul>
   </section>
 
   <section>
-    <h2><i class="ph ph-check-circle icon"></i> Tareas del proyecto activo</h2>
-    <input id="nuevaTarea" placeholder="Nueva tarea" />
-    <button onclick="agregarTarea()"><i class="ph ph-plus icon"></i> Añadir</button>
+    <h2>✅ Tareas</h2>
+    <select id="selectorProyecto" onchange="mostrarTareasProyecto()">
+      <option disabled selected>Selecciona un proyecto</option>
+    </select>
+    <input type="text" id="nuevaTarea" placeholder="Nueva tarea" />
+    <button onclick="agregarTarea()">Agregar Tarea</button>
     <ul id="listaTareas"></ul>
   </section>
 
   <section>
-    <h2><i class="ph ph-clock icon"></i> Horarios</h2>
-    <input id="nuevoHorario" placeholder="Nuevo horario" />
-    <button onclick="agregarHorario()"><i class="ph ph-plus icon"></i> Añadir</button>
+    <h2>🕒 Horarios</h2>
+    <input type="text" id="nuevoHorario" placeholder="Nuevo horario" />
+    <button onclick="agregarHorario()">Agregar Horario</button>
     <ul id="listaHorarios"></ul>
   </section>
 
   <section>
-    <h2><i class="ph ph-calendar icon"></i> Agenda</h2>
-    <input id="nuevoEvento" placeholder="Evento" />
+    <h2>📅 Agenda</h2>
+    <input type="text" id="nuevoEvento" placeholder="Nuevo evento" />
     <input type="datetime-local" id="fechaEvento" />
-    <button onclick="agregarEvento()"><i class="ph ph-plus icon"></i> Añadir</button>
+    <button onclick="agregarEvento()">Agregar Evento</button>
     <ul id="listaAgenda"></ul>
   </section>
 
-  <section>
-    <h2><i class="ph ph-chart-bar icon"></i> Estadísticas</h2>
-    <p id="estadisticas"></p>
-  </section>
+  <div id="estadisticas"></div>
 
-  <!-- Tu script original permanece igual -->
   <script>
-    // ... (todo tu código JS original aquí, sin cambios)
+    let proyectos = {};
+    let agenda = [];
+
+    function actualizarEstadisticas() {
+      const totalProyectos = Object.keys(proyectos).length;
+      const totalTareas = Object.values(proyectos).reduce((acc, tareas) => acc + tareas.length, 0);
+      const totalHorarios = document.querySelectorAll("#listaHorarios li").length;
+      const totalEventos = agenda.length;
+      document.getElementById("estadisticas").textContent =
+        `Proyectos: ${totalProyectos}, Tareas: ${totalTareas}, Horarios: ${totalHorarios}, Eventos: ${totalEventos}`;
+    }
+
+    function crearElemento(texto, editarCallback, eliminarCallback) {
+      const li = document.createElement("li");
+      const span = document.createElement("span");
+      span.textContent = texto;
+
+      const editarBtn = document.createElement("button");
+      editarBtn.innerHTML = '<i class="ph ph-pencil-simple icon"></i>';
+      editarBtn.onclick = () => {
+        const nuevoTexto = prompt("Editar:", span.textContent);
+        if (nuevoTexto !== null) {
+          editarCallback(nuevoTexto);
+        }
+      };
+
+      const eliminarBtn = document.createElement("button");
+      eliminarBtn.innerHTML = '<i class="ph ph-trash icon"></i>';
+      eliminarBtn.onclick = eliminarCallback;
+
+      li.appendChild(span);
+      li.appendChild(editarBtn);
+      li.appendChild(eliminarBtn);
+      return li;
+    }
+
+    function agregarProyecto() {
+      const input = document.getElementById("nuevoProyecto");
+      const nombre = input.value.trim();
+      if (nombre && !proyectos[nombre]) {
+        proyectos[nombre] = [];
+        actualizarSelectorProyectos();
+        guardarDatos();
+        input.value = "";
+        actualizarEstadisticas();
+      }
+    }
+
+    function mostrarListaProyectos() {
+      const lista = document.getElementById("listaProyectos");
+      lista.innerHTML = "";
+      Object.keys(proyectos).forEach(nombre => {
+        const li = crearElemento(
+          nombre,
+          nuevoNombre => {
+            proyectos[nuevoNombre] = proyectos[nombre];
+            delete proyectos[nombre];
+            actualizarSelectorProyectos();
+            mostrarListaProyectos();
+            guardarDatos();
+          },
+          () => {
+            delete proyectos[nombre];
+            actualizarSelectorProyectos();
+            mostrarListaProyectos();
+            guardarDatos();
+            actualizarEstadisticas();
+          }
+        );
+        lista.appendChild(li);
+      });
+    }
+
+    function actualizarSelectorProyectos() {
+      const selector = document.getElementById("selectorProyecto");
+      selector.innerHTML = '<option disabled selected>Selecciona un proyecto</option>';
+      Object.keys(proyectos).forEach(nombre => {
+        const option = document.createElement("option");
+        option.value = nombre;
+        option.textContent = nombre;
+        selector.appendChild(option);
+      });
+      mostrarListaProyectos();
+    }
+
+    function mostrarTareasProyecto() {
+      const proyecto = document.getElementById("selectorProyecto").value;
+      const lista = document.getElementById("listaTareas");
+      lista.innerHTML = "";
+      if (proyectos[proyecto]) {
+        proyectos[proyecto].forEach((tarea, i) => {
+          const li = crearElemento(
+            tarea,
+            nuevoTexto => {
+              proyectos[proyecto][i] = nuevoTexto;
+              guardarDatos();
+              mostrarTareasProyecto();
+            },
+            () => {
+              proyectos[proyecto].splice(i, 1);
+              guardarDatos();
+              mostrarTareasProyecto();
+              actualizarEstadisticas();
+            }
+          );
+          lista.appendChild(li);
+        });
+      }
+    }
+
+    function agregarTarea() {
+      const input = document.getElementById("nuevaTarea");
+      const tarea = input.value.trim();
+      const proyecto = document.getElementById("selectorProyecto").value;
+      if (tarea && proyecto && proyectos[proyecto]) {
+        proyectos[proyecto].push(tarea);
+        guardarDatos();
+        mostrarTareasProyecto();
+        input.value = "";
+        actualizarEstadisticas();
+      }
+    }
+
+    function agregarHorario() {
+      const input = document.getElementById("nuevoHorario");
+      const texto = input.value.trim();
+      if (texto) {
+        const li = crearElemento(
+          texto,
+          nuevoTexto => {
+            li.querySelector("span").textContent = nuevoTexto;
+            guardarDatos();
+          },
+          () => {
+            li.remove();
+            guardarDatos();
+            actualizarEstadisticas();
+          }
+        );
+        document.getElementById("listaHorarios").appendChild(li);
+        input.value = "";
+        guardarDatos();
+        actualizarEstadisticas();
+      }
+    }
+
+    function agregarEvento() {
+      const texto = document.getElementById("nuevoEvento").value.trim();
+      const fecha = document.getElementById("fechaEvento").value;
+      if (texto && fecha) {
+        agenda.push({ texto, fecha });
+        guardarDatos();
+        mostrarAgenda();
+        document.getElementById("nuevoEvento").value = "";
+        document.getElementById("fechaEvento").value = "";
+        actualizarEstadisticas();
+      }
+    }
+
+    function mostrarAgenda() {
+      const lista = document.getElementById("listaAgenda");
+      lista.innerHTML = "";
+      agenda
+                .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+        .forEach((evento, i) => {
+          const li = crearElemento(
+            `${evento.texto} – ${new Date(evento.fecha).toLocaleString()}`,
+            nuevoTexto => {
+              const nuevaFecha = prompt("Nueva fecha (YYYY-MM-DD HH:MM):", evento.fecha);
+              if (nuevaFecha) {
+                agenda[i] = { texto: nuevoTexto, fecha: nuevaFecha };
+                guardarDatos();
+                mostrarAgenda();
+              }
+            },
+            () => {
+              agenda.splice(i, 1);
+              guardarDatos();
+              mostrarAgenda();
+              actualizarEstadisticas();
+            }
+          );
+          lista.appendChild(li);
+        });
+    }
+
+    function guardarDatos() {
+      localStorage.setItem("proyectosData", JSON.stringify(proyectos));
+      localStorage.setItem("agendaData", JSON.stringify(agenda));
+      const horarios = Array.from(document.querySelectorAll("#listaHorarios li span")).map(span => span.textContent);
+      localStorage.setItem("horariosData", JSON.stringify(horarios));
+    }
+
+    function cargarDatos() {
+      proyectos = JSON.parse(localStorage.getItem("proyectosData")) || {};
+      agenda = JSON.parse(localStorage.getItem("agendaData")) || [];
+      const horarios = JSON.parse(localStorage.getItem("horariosData")) || [];
+
+      horarios.forEach(texto => {
+        const li = crearElemento(
+          texto,
+          nuevoTexto => {
+            li.querySelector("span").textContent = nuevoTexto;
+            guardarDatos();
+          },
+          () => {
+            li.remove();
+            guardarDatos();
+            actualizarEstadisticas();
+          }
+        );
+        document.getElementById("listaHorarios").appendChild(li);
+      });
+
+      actualizarSelectorProyectos();
+      mostrarAgenda();
+      actualizarEstadisticas();
+    }
+
+    window.onload = cargarDatos;
   </script>
 
   <script>

@@ -5,13 +5,92 @@ function mostrarSeccion(id) {
   document.getElementById(id).classList.remove("oculto");
 }
 
+// === CLIENTES ===
+function agregarCliente() {
+  const empresa = document.getElementById("empresaCliente").value.trim();
+  const contacto = document.getElementById("contactoCliente").value.trim();
+  const notas = document.getElementById("notasCliente").value.trim();
+  if (empresa === "") return;
+
+  const clientes = obtenerDatos("clientes");
+  clientes.push({ id: Date.now(), empresa, contacto, notas });
+  guardarDatos("clientes", clientes);
+  mostrarClientes();
+  actualizarSelectorClientes();
+  document.getElementById("form-cliente").reset();
+}
+
+function mostrarClientes() {
+  const lista = document.getElementById("lista-clientes");
+  lista.innerHTML = "";
+  const clientes = obtenerDatos("clientes");
+
+  clientes.forEach((cliente, index) => {
+    const li = document.createElement("li");
+    li.textContent = cliente.empresa;
+
+    const btnEditar = document.createElement("button");
+    btnEditar.className = "boton-accion boton-editar";
+    btnEditar.innerHTML = '<i class="ph ph-pencil-simple"></i>';
+    btnEditar.onclick = () => editarCliente(index);
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.className = "boton-accion boton-eliminar";
+    btnEliminar.innerHTML = '<i class="ph ph-trash"></i>';
+    btnEliminar.onclick = () => eliminarCliente(index);
+
+    li.appendChild(btnEditar);
+    li.appendChild(btnEliminar);
+    lista.appendChild(li);
+  });
+}
+
+function editarCliente(index) {
+  const clientes = obtenerDatos("clientes");
+  const nuevoNombre = prompt("Editar nombre de empresa:", clientes[index].empresa);
+  if (nuevoNombre && nuevoNombre.trim() !== "") {
+    clientes[index].empresa = nuevoNombre.trim();
+    guardarDatos("clientes", clientes);
+    mostrarClientes();
+    actualizarSelectorClientes();
+  }
+}
+
+function eliminarCliente(index) {
+  const clientes = obtenerDatos("clientes");
+  const clienteId = clientes[index].id;
+  clientes.splice(index, 1);
+  guardarDatos("clientes", clientes);
+
+  // Eliminar proyectos asociados
+  const proyectos = obtenerDatos("proyectos").filter(p => p.clienteId !== clienteId);
+  guardarDatos("proyectos", proyectos);
+
+  mostrarClientes();
+  mostrarProyectos();
+  actualizarSelectorClientes();
+}
+
+function actualizarSelectorClientes() {
+  const selector = document.getElementById("selectorCliente");
+  selector.innerHTML = "";
+  const clientes = obtenerDatos("clientes");
+  clientes.forEach(cliente => {
+    const option = document.createElement("option");
+    option.value = cliente.id;
+    option.textContent = cliente.empresa;
+    selector.appendChild(option);
+  });
+}
+
 // === PROYECTOS ===
 function agregarProyecto() {
   const nombre = document.getElementById("nuevoProyecto").value.trim();
+  const clienteId = document.getElementById("selectorCliente").value;
   if (nombre === "") return;
 
   const proyectos = obtenerDatos("proyectos");
-  proyectos.push({ nombre, tareas: [] });
+  proyectos.push({ nombre, clienteId, tareas: [] });
   guardarDatos("proyectos", proyectos);
   mostrarProyectos();
   document.getElementById("nuevoProyecto").value = "";
@@ -21,10 +100,14 @@ function mostrarProyectos() {
   const lista = document.getElementById("listaProyectos");
   lista.innerHTML = "";
   const proyectos = obtenerDatos("proyectos");
+  const clientes = obtenerDatos("clientes");
 
   proyectos.forEach((proyecto, index) => {
+    const cliente = clientes.find(c => c.id == proyecto.clienteId);
+    const nombreCliente = cliente ? ` (${cliente.empresa})` : "";
+
     const li = document.createElement("li");
-    li.textContent = proyecto.nombre;
+    li.textContent = proyecto.nombre + nombreCliente;
     li.onclick = () => mostrarTareasProyecto(index);
 
     const btnEditar = document.createElement("button");
@@ -168,4 +251,22 @@ function guardarDatos(clave, datos) {
 // === INICIALIZACIÓN ===
 document.addEventListener("DOMContentLoaded", () => {
   mostrarProyectos();
+  mostrarClientes();
+  actualizarSelectorClientes();
+
+  // Formularios
+  document.getElementById("form-proyecto").addEventListener("submit", (e) => {
+    e.preventDefault();
+    agregarProyecto();
+  });
+
+  document.getElementById("form-tarea").addEventListener("submit", (e) => {
+    e.preventDefault();
+    agregarTarea();
+  });
+
+  document.getElementById("form-cliente").addEventListener("submit", (e) => {
+    e.preventDefault();
+    agregarCliente();
+  });
 });

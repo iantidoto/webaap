@@ -10,17 +10,26 @@
 <body>
   <header>
     <h1>Gestor Profesional TIC</h1>
+    <nav class="tabs">
+      <button onclick="mostrarSeccion('proyectos')">🗂️ Proyectos</button>
+      <button onclick="mostrarSeccion('tareas')">✅ Tareas</button>
+      <button onclick="mostrarSeccion('horarios')">🕒 Horarios</button>
+      <button onclick="mostrarSeccion('agenda')">📅 Agenda</button>
+      <button onclick="mostrarSeccion('clientes')">👥 Clientes</button>
+    </nav>
   </header>
 
   <main>
-    <section id="proyectos">
+    <!-- Proyectos -->
+    <section id="proyectos" class="seccion">
       <h2>Proyectos</h2>
       <input type="text" id="nuevoProyecto" placeholder="Nombre del proyecto" />
       <button onclick="agregarProyecto()">Agregar Proyecto</button>
       <ul id="listaProyectos"></ul>
     </section>
 
-    <section id="tareas">
+    <!-- Tareas -->
+    <section id="tareas" class="seccion oculto">
       <h2>Tareas</h2>
       <input type="text" id="nuevaTarea" placeholder="Descripción de la tarea" />
       <select id="estadoTarea">
@@ -34,6 +43,36 @@
       <input type="number" id="porcentajeTarea" placeholder="% completado" min="0" max="100" />
       <button onclick="agregarTarea()">Agregar Tarea</button>
       <ul id="listaTareas"></ul>
+    </section>
+
+    <!-- Horarios -->
+    <section id="horarios" class="seccion oculto">
+      <h2>Horarios</h2>
+      <input type="text" id="nuevoHorario" placeholder="Descripción del horario" />
+      <input type="time" id="horaInicio" />
+      <input type="time" id="horaFin" />
+      <button onclick="agregarHorario()">Agregar Horario</button>
+      <ul id="listaHorarios"></ul>
+    </section>
+
+    <!-- Agenda -->
+    <section id="agenda" class="seccion oculto">
+      <h2>Agenda</h2>
+      <input type="text" id="nuevoEvento" placeholder="Evento" />
+      <input type="date" id="fechaEvento" />
+      <input type="time" id="horaEvento" />
+      <button onclick="agregarEvento()">Agregar Evento</button>
+      <ul id="listaAgenda"></ul>
+    </section>
+
+    <!-- Clientes -->
+    <section id="clientes" class="seccion oculto">
+      <h2>Clientes</h2>
+      <input type="text" id="empresaCliente" placeholder="Empresa" />
+      <input type="text" id="contactoCliente" placeholder="Contacto" />
+      <textarea id="notasCliente" placeholder="Notas"></textarea>
+      <button onclick="agregarCliente()">Agregar Cliente</button>
+      <ul id="listaClientes"></ul>
     </section>
   </main>
 

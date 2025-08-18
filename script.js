@@ -26,14 +26,44 @@ function mostrarProyectos() {
     const li = document.createElement("li");
     li.textContent = proyecto.nombre;
     li.onclick = () => mostrarTareasProyecto(index);
+
+    const btnEditar = document.createElement("button");
+    btnEditar.className = "boton-accion boton-editar";
+    btnEditar.innerHTML = '<i class="ph ph-pencil-simple"></i>';
+    btnEditar.onclick = (e) => {
+      e.stopPropagation();
+      editarProyecto(index);
+    };
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.className = "boton-accion boton-eliminar";
+    btnEliminar.innerHTML = '<i class="ph ph-trash"></i>';
+    btnEliminar.onclick = (e) => {
+      e.stopPropagation();
+      eliminarProyecto(index);
+    };
+
+    li.appendChild(btnEditar);
+    li.appendChild(btnEliminar);
     lista.appendChild(li);
   });
 }
 
-function mostrarTareasProyecto(index) {
-  localStorage.setItem("proyectoActual", index);
-  mostrarSeccion("tareas");
-  mostrarTareas();
+function editarProyecto(index) {
+  const proyectos = obtenerDatos("proyectos");
+  const nuevoNombre = prompt("Editar nombre del proyecto:", proyectos[index].nombre);
+  if (nuevoNombre && nuevoNombre.trim() !== "") {
+    proyectos[index].nombre = nuevoNombre.trim();
+    guardarDatos("proyectos", proyectos);
+    mostrarProyectos();
+  }
+}
+
+function eliminarProyecto(index) {
+  const proyectos = obtenerDatos("proyectos");
+  proyectos.splice(index, 1);
+  guardarDatos("proyectos", proyectos);
+  mostrarProyectos();
 }
 
 // === TAREAS ===
@@ -48,7 +78,6 @@ function agregarTarea() {
   const tarea = { descripcion, estado, estadoEmoji, porcentaje };
   const index = parseInt(localStorage.getItem("proyectoActual"));
   const proyectos = obtenerDatos("proyectos");
-
   proyectos[index].tareas.push(tarea);
   guardarDatos("proyectos", proyectos);
   mostrarTareas();
@@ -64,7 +93,7 @@ function mostrarTareas() {
   const proyectos = obtenerDatos("proyectos");
   const tareas = proyectos[index]?.tareas || [];
 
-  tareas.forEach(tarea => {
+  tareas.forEach((tarea, i) => {
     const li = document.createElement("li");
 
     const estado = document.createElement("div");
@@ -76,104 +105,55 @@ function mostrarTareas() {
 
     const progreso = document.createElement("div");
     progreso.className = "progreso";
-
     const barra = document.createElement("div");
     barra.className = "barra";
     barra.style.width = `${tarea.porcentaje}%`;
-
     progreso.appendChild(barra);
+
+    const btnEditar = document.createElement("button");
+    btnEditar.className = "boton-accion boton-editar";
+    btnEditar.innerHTML = '<i class="ph ph-pencil-simple"></i>';
+    btnEditar.onclick = () => editarTarea(i);
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.className = "boton-accion boton-eliminar";
+    btnEliminar.innerHTML = '<i class="ph ph-trash"></i>';
+    btnEliminar.onclick = () => eliminarTarea(i);
+
     li.appendChild(estado);
     li.appendChild(descripcion);
     li.appendChild(progreso);
+    li.appendChild(btnEditar);
+    li.appendChild(btnEliminar);
     lista.appendChild(li);
   });
 }
 
-// === HORARIOS ===
-function agregarHorario() {
-  const texto = document.getElementById("nuevoHorario").value.trim();
-  const inicio = document.getElementById("horaInicio").value;
-  const fin = document.getElementById("horaFin").value;
-  if (texto === "" || !inicio || !fin) return;
+function editarTarea(i) {
+  const index = parseInt(localStorage.getItem("proyectoActual"));
+  const proyectos = obtenerDatos("proyectos");
+  const tarea = proyectos[index].tareas[i];
 
-  const horarios = obtenerDatos("horarios");
-  horarios.push({ texto, inicio, fin });
-  guardarDatos("horarios", horarios);
-  mostrarHorarios();
-
-  document.getElementById("nuevoHorario").value = "";
-  document.getElementById("horaInicio").value = "";
-  document.getElementById("horaFin").value = "";
+  const nuevaDescripcion = prompt("Editar descripción:", tarea.descripcion);
+  if (nuevaDescripcion && nuevaDescripcion.trim() !== "") {
+    tarea.descripcion = nuevaDescripcion.trim();
+    guardarDatos("proyectos", proyectos);
+    mostrarTareas();
+  }
 }
 
-function mostrarHorarios() {
-  const lista = document.getElementById("listaHorarios");
-  lista.innerHTML = "";
-  const horarios = obtenerDatos("horarios");
-
-  horarios.forEach(h => {
-    const li = document.createElement("li");
-    li.textContent = `${h.texto} (${h.inicio} - ${h.fin})`;
-    lista.appendChild(li);
-  });
+function eliminarTarea(i) {
+  const index = parseInt(localStorage.getItem("proyectoActual"));
+  const proyectos = obtenerDatos("proyectos");
+  proyectos[index].tareas.splice(i, 1);
+  guardarDatos("proyectos", proyectos);
+  mostrarTareas();
 }
 
-// === AGENDA ===
-function agregarEvento() {
-  const texto = document.getElementById("nuevoEvento").value.trim();
-  const fecha = document.getElementById("fechaEvento").value;
-  const hora = document.getElementById("horaEvento").value;
-  if (texto === "" || !fecha || !hora) return;
-
-  const agenda = obtenerDatos("agenda");
-  agenda.push({ texto, fecha, hora });
-  guardarDatos("agenda", agenda);
-  mostrarAgenda();
-
-  document.getElementById("nuevoEvento").value = "";
-  document.getElementById("fechaEvento").value = "";
-  document.getElementById("horaEvento").value = "";
-}
-
-function mostrarAgenda() {
-  const lista = document.getElementById("listaAgenda");
-  lista.innerHTML = "";
-  const agenda = obtenerDatos("agenda");
-
-  agenda.forEach(e => {
-    const li = document.createElement("li");
-    li.textContent = `${e.texto} - ${e.fecha} ${e.hora}`;
-    lista.appendChild(li);
-  });
-}
-
-// === CLIENTES ===
-function agregarCliente() {
-  const empresa = document.getElementById("empresaCliente").value.trim();
-  const contacto = document.getElementById("contactoCliente").value.trim();
-  const notas = document.getElementById("notasCliente").value.trim();
-  if (empresa === "" || contacto === "") return;
-
-  const clientes = obtenerDatos("clientes");
-  clientes.push({ empresa, contacto, notas });
-  guardarDatos("clientes", clientes);
-  mostrarClientes();
-
-  document.getElementById("empresaCliente").value = "";
-  document.getElementById("contactoCliente").value = "";
-  document.getElementById("notasCliente").value = "";
-}
-
-function mostrarClientes() {
-  const lista = document.getElementById("listaClientes");
-  lista.innerHTML = "";
-  const clientes = obtenerDatos("clientes");
-
-  clientes.forEach(c => {
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${c.empresa}</strong> - ${c.contacto}<br><em>${c.notas}</em>`;
-    lista.appendChild(li);
-  });
+function mostrarTareasProyecto(index) {
+  localStorage.setItem("proyectoActual", index);
+  mostrarSeccion("tareas");
+  mostrarTareas();
 }
 
 // === UTILIDADES ===
@@ -185,10 +165,7 @@ function guardarDatos(clave, datos) {
   localStorage.setItem(clave, JSON.stringify(datos));
 }
 
-// === Cargar todo al iniciar ===
-window.onload = function () {
+// === INICIALIZACIÓN ===
+document.addEventListener("DOMContentLoaded", () => {
   mostrarProyectos();
-  mostrarHorarios();
-  mostrarAgenda();
-  mostrarClientes();
-};
+});

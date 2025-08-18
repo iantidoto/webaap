@@ -1,0 +1,93 @@
+/* Estilos generales */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9fafb;
+  color: #333;
+}
+
+header, footer {
+  background-color: #1f2937;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
+
+main {
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+section {
+  flex: 1 1 400px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+input, select, button {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}
+
+/* Estados de tarea */
+.estado {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.preparacion { background: #fef3c7; color: #92400e; }
+.ejecucion   { background: #dbeafe; color: #1d4ed8; }
+.espera      { background: #fef9c3; color: #92400e; }
+.cancelado   { background: #fee2e2; color: #b91c1c; }
+.pausado     { background: #e0f2fe; color: #0369a1; }
+.finalizado  { background: #dcfce7; color: #15803d; }
+
+/* Barra de progreso */
+.progreso {
+  background: #e5e7eb;
+  border-radius: 6px;
+  height: 10px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.barra {
+  background: #2563eb;
+  height: 100%;
+  transition: width 0.3s ease;
+}

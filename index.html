@@ -3,83 +3,84 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor Profesional TIC</title>
+  <title>Gestión Zen</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://unpkg.com/phosphor-icons"></script>
+  <script src="script.js" defer></script>
+  <link href="https://unpkg.com/phosphor-icons" rel="stylesheet" />
 </head>
 <body>
   <header>
-    <h1>Gestor Profesional TIC</h1>
-    <nav class="tabs">
-      <button onclick="mostrarSeccion('proyectos')">🗂️ Proyectos</button>
-      <button onclick="mostrarSeccion('tareas')">✅ Tareas</button>
-      <button onclick="mostrarSeccion('horarios')">🕒 Horarios</button>
-      <button onclick="mostrarSeccion('agenda')">📅 Agenda</button>
-      <button onclick="mostrarSeccion('clientes')">👥 Clientes</button>
-    </nav>
+    <h1>🧘 Gestión Zen</h1>
+    <p>Tu espacio de control total para proyectos, tareas y clientes</p>
   </header>
 
-  <main>
-    <!-- Proyectos -->
+  <main class="container">
+    <!-- Navegación por pestañas -->
+    <div class="tabs">
+      <button onclick="mostrarSeccion('proyectos')">Proyectos</button>
+      <button onclick="mostrarSeccion('tareas')">Tareas</button>
+      <button onclick="mostrarSeccion('clientes')">Clientes</button>
+    </div>
+
+    <!-- Sección Proyectos -->
     <section id="proyectos" class="seccion">
-      <h2>Proyectos</h2>
-      <input type="text" id="nuevoProyecto" placeholder="Nombre del proyecto" />
-      <button onclick="agregarProyecto()">Agregar Proyecto</button>
-      <ul id="listaProyectos"></ul>
+      <h2>📂 Proyectos</h2>
+      <form id="form-proyecto">
+        <input type="text" placeholder="Nombre del proyecto" required />
+        <button type="submit">Agregar Proyecto</button>
+      </form>
+      <ul id="lista-proyectos">
+        <li>
+          Prueba Proyecto
+          <button class="boton-accion boton-editar"><i class="ph ph-pencil-simple"></i></button>
+          <button class="boton-accion boton-eliminar"><i class="ph ph-trash"></i></button>
+        </li>
+      </ul>
     </section>
 
-    <!-- Tareas -->
+    <!-- Sección Tareas -->
     <section id="tareas" class="seccion oculto">
-      <h2>Tareas</h2>
-      <input type="text" id="nuevaTarea" placeholder="Descripción de la tarea" />
-      <select id="estadoTarea">
-        <option value="preparacion">🟡 En preparación</option>
-        <option value="ejecucion">🔵 En ejecución</option>
-        <option value="espera">🟠 En espera</option>
-        <option value="cancelado">🔴 Cancelado</option>
-        <option value="pausado">⚪ Pausado</option>
-        <option value="finalizado">🟢 Finalizado</option>
-      </select>
-      <input type="number" id="porcentajeTarea" placeholder="% completado" min="0" max="100" />
-      <button onclick="agregarTarea()">Agregar Tarea</button>
-      <ul id="listaTareas"></ul>
+      <h2>✅ Tareas</h2>
+      <form id="form-tarea">
+        <input type="text" placeholder="Descripción de la tarea" required />
+        <select>
+          <option>🟡 En preparación</option>
+          <option>🟢 En progreso</option>
+          <option>✅ Completada</option>
+        </select>
+        <input type="number" placeholder="% completado" min="0" max="100" />
+        <button type="submit">Agregar Tarea</button>
+      </form>
+      <ul id="lista-tareas">
+        <li>
+          Tarea de ejemplo
+          <button class="boton-accion boton-editar"><i class="ph ph-pencil-simple"></i></button>
+          <button class="boton-accion boton-eliminar"><i class="ph ph-trash"></i></button>
+        </li>
+      </ul>
     </section>
 
-    <!-- Horarios -->
-    <section id="horarios" class="seccion oculto">
-      <h2>Horarios</h2>
-      <input type="text" id="nuevoHorario" placeholder="Descripción del horario" />
-      <input type="time" id="horaInicio" />
-      <input type="time" id="horaFin" />
-      <button onclick="agregarHorario()">Agregar Horario</button>
-      <ul id="listaHorarios"></ul>
-    </section>
-
-    <!-- Agenda -->
-    <section id="agenda" class="seccion oculto">
-      <h2>Agenda</h2>
-      <input type="text" id="nuevoEvento" placeholder="Evento" />
-      <input type="date" id="fechaEvento" />
-      <input type="time" id="horaEvento" />
-      <button onclick="agregarEvento()">Agregar Evento</button>
-      <ul id="listaAgenda"></ul>
-    </section>
-
-    <!-- Clientes -->
+    <!-- Sección Clientes -->
     <section id="clientes" class="seccion oculto">
-      <h2>Clientes</h2>
-      <input type="text" id="empresaCliente" placeholder="Empresa" />
-      <input type="text" id="contactoCliente" placeholder="Contacto" />
-      <textarea id="notasCliente" placeholder="Notas"></textarea>
-      <button onclick="agregarCliente()">Agregar Cliente</button>
-      <ul id="listaClientes"></ul>
+      <h2>👥 Clientes</h2>
+      <form id="form-cliente">
+        <input type="text" placeholder="Empresa" required />
+        <input type="text" placeholder="Contacto" />
+        <textarea placeholder="Notas"></textarea>
+        <button type="submit">Agregar Cliente</button>
+      </form>
+      <ul id="lista-clientes">
+        <li>
+          Cliente de ejemplo
+          <button class="boton-accion boton-editar"><i class="ph ph-pencil-simple"></i></button>
+          <button class="boton-accion boton-eliminar"><i class="ph ph-trash"></i></button>
+        </li>
+      </ul>
     </section>
   </main>
 
   <footer>
-    <p>© 2025 Pablo · Proyecto Webaap</p>
+    <p>© 2025 Pablo · Proyecto Gestión Zen</p>
   </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>

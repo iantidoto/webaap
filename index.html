@@ -26,56 +26,41 @@
     <section id="proyectos" class="seccion">
       <h2>📂 Proyectos</h2>
       <form id="form-proyecto">
-        <input type="text" placeholder="Nombre del proyecto" required />
+        <input type="text" id="nuevoProyecto" placeholder="Nombre del proyecto" required />
+        <select id="selectorCliente" required>
+          <option value="">Selecciona un cliente</option>
+        </select>
         <button type="submit">Agregar Proyecto</button>
       </form>
-      <ul id="lista-proyectos">
-        <li>
-          Prueba Proyecto
-          <button class="boton-accion boton-editar"><i class="ph ph-pencil-simple"></i></button>
-          <button class="boton-accion boton-eliminar"><i class="ph ph-trash"></i></button>
-        </li>
-      </ul>
+      <ul id="listaProyectos"></ul>
     </section>
 
     <!-- Sección Tareas -->
     <section id="tareas" class="seccion oculto">
       <h2>✅ Tareas</h2>
       <form id="form-tarea">
-        <input type="text" placeholder="Descripción de la tarea" required />
-        <select>
-          <option>🟡 En preparación</option>
-          <option>🟢 En progreso</option>
-          <option>✅ Completada</option>
+        <input type="text" id="nuevaTarea" placeholder="Descripción de la tarea" required />
+        <select id="estadoTarea">
+          <option value="pendiente">🟡 En preparación</option>
+          <option value="progreso">🟢 En progreso</option>
+          <option value="completada">✅ Completada</option>
         </select>
-        <input type="number" placeholder="% completado" min="0" max="100" />
+        <input type="number" id="porcentajeTarea" placeholder="% completado" min="0" max="100" />
         <button type="submit">Agregar Tarea</button>
       </form>
-      <ul id="lista-tareas">
-        <li>
-          Tarea de ejemplo
-          <button class="boton-accion boton-editar"><i class="ph ph-pencil-simple"></i></button>
-          <button class="boton-accion boton-eliminar"><i class="ph ph-trash"></i></button>
-        </li>
-      </ul>
+      <ul id="listaTareas"></ul>
     </section>
 
     <!-- Sección Clientes -->
     <section id="clientes" class="seccion oculto">
       <h2>👥 Clientes</h2>
       <form id="form-cliente">
-        <input type="text" placeholder="Empresa" required />
-        <input type="text" placeholder="Contacto" />
-        <textarea placeholder="Notas"></textarea>
+        <input type="text" id="empresaCliente" placeholder="Empresa" required />
+        <input type="text" id="contactoCliente" placeholder="Contacto" />
+        <textarea id="notasCliente" placeholder="Notas"></textarea>
         <button type="submit">Agregar Cliente</button>
       </form>
-      <ul id="lista-clientes">
-        <li>
-          Cliente de ejemplo
-          <button class="boton-accion boton-editar"><i class="ph ph-pencil-simple"></i></button>
-          <button class="boton-accion boton-eliminar"><i class="ph ph-trash"></i></button>
-        </li>
-      </ul>
+      <ul id="lista-clientes"></ul>
     </section>
   </main>
 

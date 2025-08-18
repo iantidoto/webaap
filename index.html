@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor Profesional TIC</title>
-  <!-- Iconos Phosphor -->
   <script src="https://unpkg.com/phosphor-icons"></script>
   <style>
     :root {
@@ -104,19 +103,31 @@
     <ul id="listaAgenda"></ul>
   </section>
 
+  <section>
+    <h2>👥 Clientes</h2>
+    <input type="text" id="nombreCliente" placeholder="Nombre del cliente" />
+    <input type="text" id="empresaCliente" placeholder="Empresa" />
+    <input type="text" id="contactoCliente" placeholder="Contacto (email o teléfono)" />
+    <textarea id="notasCliente" placeholder="Notas u observaciones"></textarea>
+    <button onclick="agregarCliente()">Agregar Cliente</button>
+    <ul id="listaClientes"></ul>
+  </section>
+
   <div id="estadisticas"></div>
 
   <script>
     let proyectos = {};
     let agenda = [];
+    let clientes = [];
 
     function actualizarEstadisticas() {
       const totalProyectos = Object.keys(proyectos).length;
       const totalTareas = Object.values(proyectos).reduce((acc, tareas) => acc + tareas.length, 0);
       const totalHorarios = document.querySelectorAll("#listaHorarios li").length;
       const totalEventos = agenda.length;
+      const totalClientes = clientes.length;
       document.getElementById("estadisticas").textContent =
-        `Proyectos: ${totalProyectos}, Tareas: ${totalTareas}, Horarios: ${totalHorarios}, Eventos: ${totalEventos}`;
+        `Proyectos: ${totalProyectos}, Tareas: ${totalTareas}, Horarios: ${totalHorarios}, Eventos: ${totalEventos}, Clientes: ${totalClientes}`;
     }
 
     function crearElemento(texto, editarCallback, eliminarCallback) {
@@ -252,6 +263,7 @@
         actualizarEstadisticas();
       }
     }
+    }
 
     function agregarEvento() {
       const texto = document.getElementById("nuevoEvento").value.trim();
@@ -270,7 +282,7 @@
       const lista = document.getElementById("listaAgenda");
       lista.innerHTML = "";
       agenda
-                .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+        .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
         .forEach((evento, i) => {
           const li = crearElemento(
             `${evento.texto} – ${new Date(evento.fecha).toLocaleString()}`,
@@ -293,9 +305,57 @@
         });
     }
 
+    function agregarCliente() {
+      const nombre = document.getElementById("nombreCliente").value.trim();
+      const empresa = document.getElementById("empresaCliente").value.trim();
+      const contacto = document.getElementById("contactoCliente").value.trim();
+      const notas = document.getElementById("notasCliente").value.trim();
+
+      if (nombre && contacto) {
+        clientes.push({ nombre, empresa, contacto, notas });
+        guardarDatos();
+        mostrarClientes();
+        document.getElementById("nombreCliente").value = "";
+        document.getElementById("empresaCliente").value = "";
+        document.getElementById("contactoCliente").value = "";
+        document.getElementById("notasCliente").value = "";
+        actualizarEstadisticas();
+      }
+    }
+
+    function mostrarClientes() {
+      const lista = document.getElementById("listaClientes");
+      lista.innerHTML = "";
+      clientes.forEach((cliente, i) => {
+        const li = crearElemento(
+          `${cliente.nombre} (${cliente.empresa}) – ${cliente.contacto}`,
+          nuevoTexto => {
+            const partes = nuevoTexto.split(" – ");
+            if (partes.length === 2) {
+              const [nombreEmpresa, contacto] = partes;
+              const [nombre, empresa] = nombreEmpresa.split(" (");
+              clientes[i].nombre = nombre.trim();
+              clientes[i].empresa = empresa?.replace(")", "").trim() || "";
+              clientes[i].contacto = contacto.trim();
+              guardarDatos();
+              mostrarClientes();
+            }
+          },
+          () => {
+            clientes.splice(i, 1);
+            guardarDatos();
+            mostrarClientes();
+            actualizarEstadisticas();
+          }
+        );
+        lista.appendChild(li);
+      });
+    }
+
     function guardarDatos() {
       localStorage.setItem("proyectosData", JSON.stringify(proyectos));
       localStorage.setItem("agendaData", JSON.stringify(agenda));
+      localStorage.setItem("clientesData", JSON.stringify(clientes));
       const horarios = Array.from(document.querySelectorAll("#listaHorarios li span")).map(span => span.textContent);
       localStorage.setItem("horariosData", JSON.stringify(horarios));
     }
@@ -303,6 +363,7 @@
     function cargarDatos() {
       proyectos = JSON.parse(localStorage.getItem("proyectosData")) || {};
       agenda = JSON.parse(localStorage.getItem("agendaData")) || [];
+      clientes = JSON.parse(localStorage.getItem("clientesData")) || [];
       const horarios = JSON.parse(localStorage.getItem("horariosData")) || [];
 
       horarios.forEach(texto => {
@@ -323,6 +384,7 @@
 
       actualizarSelectorProyectos();
       mostrarAgenda();
+      mostrarClientes();
       actualizarEstadisticas();
     }
 
@@ -338,3 +400,4 @@
   </script>
 </body>
 </html>
+

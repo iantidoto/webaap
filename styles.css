@@ -1,128 +1,187 @@
-/* === Estilos generales === */
-body {
-  font-family: 'Segoe UI', sans-serif;
+/* === RESET === */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  background-color: #f9fafb;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
   color: #333;
+  line-height: 1.6;
 }
 
-header, footer {
-  background-color: #1f2937;
+header {
+  background-color: #4a90e2;
   color: white;
+  padding: 1.5rem;
   text-align: center;
-  padding: 1rem;
 }
 
-main {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+  padding: 1rem 2rem;
 }
 
-/* === Navegación por pestañas === */
+/* === TABS === */
 .tabs {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-  flex-wrap: nowrap; /* evita que se apilen */
-  justify-content: center;
-  background-color: #f3f4f6;
-  padding: 1rem;
-  overflow-x: auto; /* permite scroll si hay muchas pestañas */
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .tabs button {
-  background-color: #e5e7eb;
-  border: none;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border: none;
+  background-color: #e0e0e0;
   cursor: pointer;
-  font-weight: bold;
+  border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 .tabs button:hover {
-  background-color: #d1d5db;
+  background-color: #d0d0d0;
 }
 
-/* === Secciones === */
+/* === SECCIONES === */
 .seccion {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
 .oculto {
   display: none;
 }
 
-/* === Formularios e inputs === */
-input, select, textarea, button {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
+/* === FORMULARIOS === */
+form {
+  margin-bottom: 1rem;
 }
 
-/* === Botones de acción (editar/eliminar) === */
-.boton-accion {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.4rem 0.6rem;
-  margin: 0.2rem;
+input,
+select,
+textarea {
+  display: block;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button[type="submit"] {
+  background-color: #4a90e2;
+  color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #357ab8;
+}
+
+/* === LISTAS === */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background-color: #fff;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* === BOTONES DE ACCIÓN === */
+.boton-accion {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  font-size: 1.2rem;
 }
 
 .boton-editar {
-  background-color: #3b82f6;
-  color: white;
-}
-.boton-editar:hover {
-  background-color: #2563eb;
+  color: #4a90e2;
 }
 
 .boton-eliminar {
-  background-color: #ef4444;
-  color: white;
-}
-.boton-eliminar:hover {
-  background-color: #dc2626;
+  color: #e94e4e;
 }
 
-/* === Responsive para móviles === */
-@media (max-width: 600px) {
-  .tabs {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .tabs button {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .seccion {
-    padding: 10px;
-    font-size: 15px;
-  }
-
-  header, footer {
-    font-size: 14px;
-    padding: 0.5rem;
-  }
+/* === ESTADOS DE TAREA === */
+.estado {
+  font-size: 1.5rem;
+  margin-right: 1rem;
 }
+
+.estado.pendiente {
+  color: #f5a623;
+}
+
+.estado.progreso {
+  color: #7ed321;
+}
+
+.estado.completada {
+  color: #4a90e2;
+}
+
+/* === BARRA DE PROGRESO === */
+.progreso {
+  flex: 1;
+  height: 8px;
+  background-color: #eee;
+  border-radius: 4px;
+  margin: 0 1rem;
+  position: relative;
+}
+
+.barra {
+  height: 100%;
+  background-color: #4a90e2;
+  border-radius: 4px;
+}
+
+/* === DASHBOARD INICIO === */
+.dashboard {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 200px;
+  background-color: #f0f4f8;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.card p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4a90e2;
+}
+

@@ -185,3 +185,34 @@ li {
   color: #4a90e2;
 }
 
+.agenda-semana {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.dia {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.dia h3 {
+  margin-bottom: 0.5rem;
+  color: #4a90e2;
+}
+
+.dia ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.dia li {
+  background-color: #f0f4f8;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+

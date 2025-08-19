@@ -275,3 +275,38 @@ function actualizarResumen() {
   if (resumenTareas) resumenTareas.textContent = `${tareasTotales} tareas`;
   if (resumenClientes) resumenClientes.textContent = `${clientes.length} clientes`;
 }
+
+function agregarTareaAgenda(e) {
+  e.preventDefault();
+  const dia = document.getElementById("diaAgenda").value;
+  const tarea = document.getElementById("tareaAgenda").value.trim();
+  if (!dia || tarea === "") return;
+
+  const agenda = obtenerDatos("agenda");
+  if (!agenda[dia]) agenda[dia] = [];
+  agenda[dia].push(tarea);
+  guardarDatos("agenda", agenda);
+
+  mostrarAgenda();
+  document.getElementById("form-agenda").reset();
+}
+
+function mostrarAgenda() {
+  const agenda = obtenerDatos("agenda");
+  const dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+  dias.forEach(dia => {
+    const ul = document.querySelector(`#${dia} ul`);
+    ul.innerHTML = "";
+    (agenda[dia] || []).forEach(tarea => {
+      const li = document.createElement("li");
+      li.textContent = tarea;
+      ul.appendChild(li);
+    });
+  });
+}
+
+document.getElementById("form-agenda").addEventListener("submit", agregarTareaAgenda);
+
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarAgenda();
+});

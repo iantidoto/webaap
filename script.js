@@ -26,6 +26,24 @@ function agregarCliente() {
   const empresa = document.getElementById("empresaCliente").value.trim();
   const contacto = document.getElementById("contactoCliente").value.trim();
   const notas = document.getElementById("notasCliente").value.trim();
+  const telefono = document.getElementById("telefonoCliente").value.trim();
+const email = document.getElementById("emailCliente").value.trim();
+const direccion = document.getElementById("direccionCliente").value.trim();
+const tipo = document.getElementById("tipoCliente").value;
+const categoria = document.getElementById("categoriaCliente").value.trim();
+
+clientes.push({
+  id: Date.now(),
+  empresa,
+  contacto,
+  notas,
+  telefono,
+  email,
+  direccion,
+  tipo,
+  categoria
+});
+
   if (!empresa) return;
   const clientes = obtenerDatos("clientes");
   clientes.push({ id: Date.now(), empresa, contacto, notas });
@@ -52,18 +70,38 @@ function mostrarClientes() {
     li.appendChild(btnEditar);
     li.appendChild(btnEliminar);
     lista.appendChild(li);
+    li.innerHTML = `
+  <strong>${cliente.empresa}</strong> (${cliente.contacto})<br>
+  📞 ${cliente.telefono || '—'} | 📧 ${cliente.email || '—'}<br>
+  🏢 ${cliente.direccion || '—'}<br>
+  🗂️ ${cliente.tipo} | 🏷️ ${cliente.categoria}
+`;
+
   });
 }
 
 function editarCliente(index) {
   const clientes = obtenerDatos("clientes");
   const cliente = clientes[index];
+
   const empresa = prompt("Editar empresa:", cliente.empresa);
   const contacto = prompt("Editar contacto:", cliente.contacto);
+  const telefono = prompt("Editar teléfono:", cliente.telefono);
+  const email = prompt("Editar email:", cliente.email);
+  const direccion = prompt("Editar dirección:", cliente.direccion);
+  const tipo = prompt("Editar tipo de cliente:", cliente.tipo);
+  const categoria = prompt("Editar categoría:", cliente.categoria);
   const notas = prompt("Editar notas:", cliente.notas);
+
   if (empresa) cliente.empresa = empresa.trim();
   if (contacto) cliente.contacto = contacto.trim();
+  if (telefono) cliente.telefono = telefono.trim();
+  if (email) cliente.email = email.trim();
+  if (direccion) cliente.direccion = direccion.trim();
+  if (tipo) cliente.tipo = tipo.trim();
+  if (categoria) cliente.categoria = categoria.trim();
   if (notas) cliente.notas = notas.trim();
+
   guardarDatos("clientes", clientes);
   mostrarClientes();
   actualizarSelectorClientes();

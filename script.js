@@ -15,8 +15,10 @@ function agregarCliente() {
   const clientes = obtenerDatos("clientes");
   clientes.push({ id: Date.now(), empresa, contacto, notas });
   guardarDatos("clientes", clientes);
+
   mostrarClientes();
   actualizarSelectorClientes();
+  actualizarResumen();
   document.getElementById("form-cliente").reset();
 }
 
@@ -53,6 +55,7 @@ function editarCliente(index) {
     guardarDatos("clientes", clientes);
     mostrarClientes();
     actualizarSelectorClientes();
+    actualizarResumen();
   }
 }
 
@@ -62,19 +65,20 @@ function eliminarCliente(index) {
   clientes.splice(index, 1);
   guardarDatos("clientes", clientes);
 
-  // Eliminar proyectos asociados
   const proyectos = obtenerDatos("proyectos").filter(p => p.clienteId !== clienteId);
   guardarDatos("proyectos", proyectos);
 
   mostrarClientes();
   mostrarProyectos();
   actualizarSelectorClientes();
+  actualizarResumen();
 }
 
 function actualizarSelectorClientes() {
   const selector = document.getElementById("selectorCliente");
   selector.innerHTML = "";
   const clientes = obtenerDatos("clientes");
+
   clientes.forEach(cliente => {
     const option = document.createElement("option");
     option.value = cliente.id;
@@ -92,7 +96,9 @@ function agregarProyecto() {
   const proyectos = obtenerDatos("proyectos");
   proyectos.push({ nombre, clienteId, tareas: [] });
   guardarDatos("proyectos", proyectos);
+
   mostrarProyectos();
+  actualizarResumen();
   document.getElementById("nuevoProyecto").value = "";
 }
 
@@ -105,7 +111,6 @@ function mostrarProyectos() {
   proyectos.forEach((proyecto, index) => {
     const cliente = clientes.find(c => c.id == proyecto.clienteId);
     const nombreCliente = cliente ? ` (${cliente.empresa})` : "";
-
     const li = document.createElement("li");
     li.textContent = proyecto.nombre + nombreCliente;
     li.onclick = () => mostrarTareasProyecto(index);
@@ -139,6 +144,7 @@ function editarProyecto(index) {
     proyectos[index].nombre = nuevoNombre.trim();
     guardarDatos("proyectos", proyectos);
     mostrarProyectos();
+    actualizarResumen();
   }
 }
 
@@ -147,6 +153,7 @@ function eliminarProyecto(index) {
   proyectos.splice(index, 1);
   guardarDatos("proyectos", proyectos);
   mostrarProyectos();
+  actualizarResumen();
 }
 
 // === TAREAS ===
@@ -155,7 +162,6 @@ function agregarTarea() {
   const estado = document.getElementById("estadoTarea").value;
   const porcentaje = parseInt(document.getElementById("porcentajeTarea").value);
   const estadoEmoji = document.getElementById("estadoTarea").selectedOptions[0].textContent;
-
   if (descripcion === "" || isNaN(porcentaje)) return;
 
   const tarea = { descripcion, estado, estadoEmoji, porcentaje };
@@ -163,8 +169,9 @@ function agregarTarea() {
   const proyectos = obtenerDatos("proyectos");
   proyectos[index].tareas.push(tarea);
   guardarDatos("proyectos", proyectos);
-  mostrarTareas();
 
+  mostrarTareas();
+  actualizarResumen();
   document.getElementById("nuevaTarea").value = "";
   document.getElementById("porcentajeTarea").value = "";
 }
@@ -216,7 +223,6 @@ function editarTarea(i) {
   const index = parseInt(localStorage.getItem("proyectoActual"));
   const proyectos = obtenerDatos("proyectos");
   const tarea = proyectos[index].tareas[i];
-
   const nuevaDescripcion = prompt("Editar descripción:", tarea.descripcion);
   if (nuevaDescripcion && nuevaDescripcion.trim() !== "") {
     tarea.descripcion = nuevaDescripcion.trim();
@@ -231,6 +237,7 @@ function eliminarTarea(i) {
   proyectos[index].tareas.splice(i, 1);
   guardarDatos("proyectos", proyectos);
   mostrarTareas();
+  actualizarResumen();
 }
 
 function mostrarTareasProyecto(index) {
@@ -248,25 +255,23 @@ function guardarDatos(clave, datos) {
   localStorage.setItem(clave, JSON.stringify(datos));
 }
 
-// === INICIALIZACIÓN ===
-document.addEventListener("DOMContentLoaded", () => {
-  mostrarProyectos();
-  mostrarClientes();
-  actualizarSelectorClientes();
+// === DASHBOARD ===
+function actualizarResumen() {
+  const proyectos = obtenerDatos("proyectos");
+  const clientes = obtenerDatos("clientes");
 
-  // Formularios
-  document.getElementById("form-proyecto").addEventListener("submit", (e) => {
-    e.preventDefault();
-    agregarProyecto();
+  let tareasTotales = 0;
+  proyectos.forEach(p => {
+    if (Array.isArray(p.tareas)) {
+      tareasTotales += p.tareas.length;
+    }
   });
 
-  document.getElementById("form-tarea").addEventListener("submit", (e) => {
-    e.preventDefault();
-    agregarTarea();
-  });
+  const resumenProyectos = document.getElementById("resumenProyectos");
+  const resumenTareas = document.getElementById("resumenTareas");
+  const resumenClientes = document.getElementById("resumenClientes");
 
-  document.getElementById("form-cliente").addEventListener("submit", (e) => {
-    e.preventDefault();
-    agregarCliente();
-  });
-});
+  if (resumenProyectos) resumenProyectos.textContent = `${proyectos.length} proyectos`;
+  if (resumenTareas) resumenTareas.textContent = `${tareasTotales} tareas`;
+  if (resumenClientes) resumenClientes.textContent = `${clientes.length} clientes`;
+}

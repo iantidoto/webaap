@@ -300,6 +300,54 @@ function agregarTareaAgenda() {
   document.getElementById("form-agenda").reset();
 }
 
+function abrirDiaAgenda(dia) {
+  diaActual = dia;
+  document.getElementById('titulo-dia').textContent = `Agenda de ${dia}`;
+  document.getElementById('detalle-dia').classList.remove('oculto');
+  document.getElementById('fondo-modal').classList.remove('oculto');
+
+  const lista = document.getElementById('lista-dia');
+  lista.innerHTML = '';
+  const agenda = obtenerDatos('agenda');
+  (agenda[dia] || []).forEach((tarea, i) => {
+    const li = document.createElement('li');
+    li.textContent = tarea;
+
+    const btnEditar = document.createElement('button');
+    btnEditar.innerHTML = '✏️';
+    btnEditar.onclick = () => {
+      const nueva = prompt('Editar tarea:', tarea);
+      if (nueva && nueva.trim() !== '') {
+        agenda[dia][i] = nueva.trim();
+        guardarDatos('agenda', agenda);
+        abrirDiaAgenda(dia);
+        mostrarAgenda();
+      }
+    };
+
+    const btnEliminar = document.createElement('button');
+    btnEliminar.innerHTML = '🗑️';
+    btnEliminar.onclick = () => {
+      if (confirm('¿Eliminar tarea?')) {
+        agenda[dia].splice(i, 1);
+        guardarDatos('agenda', agenda);
+        abrirDiaAgenda(dia);
+        mostrarAgenda();
+      }
+    };
+
+    li.appendChild(btnEditar);
+    li.appendChild(btnEliminar);
+    lista.appendChild(li);
+  });
+}
+
+function cerrarDetalleDia() {
+  document.getElementById('detalle-dia').classList.add('oculto');
+  document.getElementById('fondo-modal').classList.add('oculto');
+  diaActual = null;
+}
+
 function mostrarAgenda() {
   const agenda = obtenerDatos("agenda");
   const dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];

@@ -18,6 +18,7 @@
     <!-- Navegación por pestañas -->
     <div class="tabs">
       <button onclick="mostrarSeccion('inicio')">Inicio</button>
+      <button onclick="mostrarSeccion('agenda')">Agenda</button>
       <button onclick="mostrarSeccion('proyectos')">Proyectos</button>
       <button onclick="mostrarSeccion('tareas')">Tareas</button>
       <button onclick="mostrarSeccion('clientes')">Clientes</button>
@@ -41,6 +42,35 @@
         </div>
       </div>
     </section>
+
+    <!-- Sección Agenda Semanal -->
+<section id="agenda" class="seccion oculto">
+  <h2>🗓️ Agenda Semanal</h2>
+  <form id="form-agenda">
+    <select id="diaAgenda" required>
+      <option value="">Selecciona un día</option>
+      <option value="lunes">Lunes</option>
+      <option value="martes">Martes</option>
+      <option value="miércoles">Miércoles</option>
+      <option value="jueves">Jueves</option>
+      <option value="viernes">Viernes</option>
+      <option value="sábado">Sábado</option>
+      <option value="domingo">Domingo</option>
+    </select>
+    <input type="text" id="tareaAgenda" placeholder="Tarea para ese día" required />
+    <button type="submit">Agregar a Agenda</button>
+  </form>
+
+  <div class="agenda-semana">
+    <div class="dia" id="lunes"><h3>Lunes</h3><ul></ul></div>
+    <div class="dia" id="martes"><h3>Martes</h3><ul></ul></div>
+    <div class="dia" id="miércoles"><h3>Miércoles</h3><ul></ul></div>
+    <div class="dia" id="jueves"><h3>Jueves</h3><ul></ul></div>
+    <div class="dia" id="viernes"><h3>Viernes</h3><ul></ul></div>
+    <div class="dia" id="sábado"><h3>Sábado</h3><ul></ul></div>
+    <div class="dia" id="domingo"><h3>Domingo</h3><ul></ul></div>
+  </div>
+</section>
 
     <!-- Sección Proyectos -->
     <section id="proyectos" class="seccion">

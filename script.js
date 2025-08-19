@@ -343,7 +343,3 @@ function eliminarTareaAgenda(dia, index) {
   mostrarAgenda();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  mostrarSeccion('inicio');
-});
-

@@ -7,16 +7,17 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
+  background-color: #121212;
+  color: #e0e0e0;
   line-height: 1.6;
 }
 
 header {
-  background-color: #4a90e2;
-  color: white;
+  background-color: #1f1f1f;
+  color: #ffffff;
   padding: 1.5rem;
   text-align: center;
+  border-bottom: 1px solid #333;
 }
 
 header h1 {
@@ -39,14 +40,15 @@ header h1 {
 .tabs button {
   padding: 0.5rem 1rem;
   border: none;
-  background-color: #e0e0e0;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 .tabs button:hover {
-  background-color: #d0d0d0;
+  background-color: #3a3a3a;
 }
 
 /* === SECCIONES === */
@@ -71,13 +73,15 @@ textarea {
   padding: 0.5rem;
   width: 100%;
   max-width: 500px;
-  border: 1px solid #ccc;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
   border-radius: 4px;
 }
 
 button[type="submit"] {
-  background-color: #4a90e2;
-  color: white;
+  background-color: #333;
+  color: #fff;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -85,7 +89,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #357ab8;
+  background-color: #555;
 }
 
 /* === LISTAS === */
@@ -95,10 +99,10 @@ ul {
 }
 
 li {
-  background-color: #fff;
+  background-color: #1e1e1e;
   margin-bottom: 0.5rem;
   padding: 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid #333;
   border-radius: 4px;
   position: relative;
   display: flex;
@@ -116,11 +120,11 @@ li {
 }
 
 .boton-editar {
-  color: #4a90e2;
+  color: #bbbbbb;
 }
 
 .boton-eliminar {
-  color: #e94e4e;
+  color: #ff6b6b;
 }
 
 /* === ESTADOS DE TAREA === */
@@ -130,22 +134,22 @@ li {
 }
 
 .estado.pendiente {
-  color: #f5a623;
+  color: #f0c674;
 }
 
 .estado.progreso {
-  color: #7ed321;
+  color: #8abeb7;
 }
 
 .estado.completada {
-  color: #4a90e2;
+  color: #b5bd68;
 }
 
 /* === BARRA DE PROGRESO === */
 .progreso {
   flex: 1;
   height: 8px;
-  background-color: #eee;
+  background-color: #333;
   border-radius: 4px;
   margin: 0 1rem;
   position: relative;
@@ -153,7 +157,7 @@ li {
 
 .barra {
   height: 100%;
-  background-color: #4a90e2;
+  background-color: #b5bd68;
   border-radius: 4px;
 }
 
@@ -168,23 +172,25 @@ li {
 .card {
   flex: 1;
   min-width: 200px;
-  background-color: #f0f4f8;
+  background-color: #1e1e1e;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #333;
 }
 
 .card h3 {
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
+  color: #cccccc;
 }
 
 .card p {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #4a90e2;
+  color: #ffffff;
 }
 
+/* === AGENDA SEMANAL === */
 .agenda-semana {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -193,15 +199,15 @@ li {
 }
 
 .dia {
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
   border-radius: 6px;
   padding: 1rem;
 }
 
 .dia h3 {
   margin-bottom: 0.5rem;
-  color: #4a90e2;
+  color: #cccccc;
 }
 
 .dia ul {
@@ -210,9 +216,9 @@ li {
 }
 
 .dia li {
-  background-color: #f0f4f8;
+  background-color: #2a2a2a;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   border-radius: 4px;
+  color: #e0e0e0;
 }
-

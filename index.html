@@ -6,7 +6,7 @@
   <title>Gestión Zen</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="script.js" defer></script>
- <link href="https://unpkg.com/phosphor-icons@1.4.2/font/phosphor.css" rel="stylesheet" />
+  <link href="https://unpkg.com/phosphor-icons@1.4.2/font/phosphor.css" rel="stylesheet" />
 </head>
 <body>
   <header>
@@ -17,10 +17,30 @@
   <main class="container">
     <!-- Navegación por pestañas -->
     <div class="tabs">
+      <button onclick="mostrarSeccion('inicio')">Inicio</button>
       <button onclick="mostrarSeccion('proyectos')">Proyectos</button>
       <button onclick="mostrarSeccion('tareas')">Tareas</button>
       <button onclick="mostrarSeccion('clientes')">Clientes</button>
     </div>
+
+    <!-- Sección Inicio -->
+    <section id="inicio" class="seccion oculto">
+      <h2>📊 Resumen General</h2>
+      <div class="dashboard">
+        <div class="card">
+          <h3>Proyectos activos</h3>
+          <p id="resumenProyectos">0 proyectos</p>
+        </div>
+        <div class="card">
+          <h3>Tareas en progreso</h3>
+          <p id="resumenTareas">0 tareas</p>
+        </div>
+        <div class="card">
+          <h3>Clientes registrados</h3>
+          <p id="resumenClientes">0 clientes</p>
+        </div>
+      </div>
+    </section>
 
     <!-- Sección Proyectos -->
     <section id="proyectos" class="seccion">
@@ -63,9 +83,5 @@
       <ul id="lista-clientes"></ul>
     </section>
   </main>
-
-  <footer>
-    <p>© 2025 Pablo · Proyecto Gestión Zen</p>
-  </footer>
 </body>
 </html>

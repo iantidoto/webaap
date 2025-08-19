@@ -343,3 +343,4 @@ function eliminarTareaAgenda(dia, index) {
   mostrarAgenda();
 }
 
+mostrarSeccion('inicio');

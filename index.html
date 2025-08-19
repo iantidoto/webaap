@@ -23,6 +23,13 @@
       <button onclick="mostrarSeccion('tareas')">Tareas</button>
       <button onclick="mostrarSeccion('clientes')">Clientes</button>
     </div>
+<div id="detalle-dia" class="oculto">
+  <h3 id="titulo-dia"></h3>
+  <ul id="lista-dia"></ul>
+  <input id="nueva-tarea-dia" placeholder="Nueva tarea">
+  <button onclick="agregarTareaADiaActual()">Agregar</button>
+  <button onclick="cerrarDetalleDia()">Cerrar</button>
+</div>
 
     <!-- Sección Inicio -->
     <section id="inicio" class="seccion oculto">

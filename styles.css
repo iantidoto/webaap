@@ -127,6 +127,12 @@ li {
   color: #ff6b6b;
 }
 
+.boton-accion:hover {
+    color: #ffffff;
+    transform: scale(1.1);
+    transition: all 0.2s ease-in-out;
+}
+
 /* === ESTADOS DE TAREA === */
 .estado {
   font-size: 1.5rem;

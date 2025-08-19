@@ -343,4 +343,7 @@ function eliminarTareaAgenda(dia, index) {
   mostrarAgenda();
 }
 
-mostrarSeccion('inicio');
+// === MOSTRAR INICIO AL CARGAR ===
+document.addEventListener('DOMContentLoaded', () => {
+  mostrarSeccion('inicio');
+});

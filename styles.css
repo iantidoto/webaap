@@ -295,3 +295,86 @@ li {
   display: none;
 }
 
+#detalle-dia {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  border: 2px solid #ccc;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  z-index: 1000;
+  max-width: 500px;
+  width: 90%;
+}
+
+#detalle-dia h3 {
+  margin-top: 0;
+  font-size: 1.6em;
+  color: #333;
+  text-align: center;
+}
+
+#lista-dia {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 15px;
+}
+
+#lista-dia li {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#lista-dia button {
+  margin-left: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+}
+
+#nueva-tarea-dia {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+#detalle-dia button {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+#detalle-dia button:hover {
+  background-color: #005fa3;
+}
+
+.oculto {
+  display: none;
+}
+
+/* Fondo oscuro detrás del modal */
+#fondo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 999;
+}

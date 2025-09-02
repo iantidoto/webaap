@@ -12,7 +12,6 @@
       padding: 0;
       color: #222;
     }
-
     .header {
       background: #fff;
       padding: 16px 20px;
@@ -22,18 +21,15 @@
       align-items: center;
       flex-wrap: wrap;
     }
-
     .header h1 {
       font-size: 20px;
       color: #1e3c72;
     }
-
     .container {
       max-width: 1200px;
       margin: 20px auto;
       padding: 0 16px;
     }
-
     .panel {
       background: #fff;
       padding: 16px;
@@ -41,12 +37,10 @@
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
     .panel h2 {
       margin-top: 0;
       color: #2a5298;
     }
-
     input[type="text"] {
       padding: 8px;
       width: 70%;
@@ -54,7 +48,12 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-
+    select {
+      padding: 8px;
+      margin-right: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
     button {
       padding: 8px 12px;
       background-color: #2a5298;
@@ -63,7 +62,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #1e3c72;
     }
@@ -88,11 +86,29 @@
       <button onclick="agregarTarea()">➕ Añadir</button>
       <ul id="listaTareas"></ul>
     </div>
+
+    <div class="panel">
+      <h2>📅 Agenda Semanal</h2>
+      <label for="dia-select">Día:</label>
+      <select id="dia-select">
+        <option value="Lunes">Lunes</option>
+        <option value="Martes">Martes</option>
+        <option value="Miércoles">Miércoles</option>
+        <option value="Jueves">Jueves</option>
+        <option value="Viernes">Viernes</option>
+        <option value="Sábado">Sábado</option>
+        <option value="Domingo">Domingo</option>
+      </select>
+      <input type="text" id="tarea-dia" placeholder="Escribe tu tarea aquí" />
+      <button onclick="agregarAgenda()">➕ Añadir</button>
+      <ul id="listaAgenda"></ul>
+    </div>
   </div>
 
   <script>
     const listaProyectos = document.getElementById("listaProyectos");
     const listaTareas = document.getElementById("listaTareas");
+    const listaAgenda = document.getElementById("listaAgenda");
 
     function agregarProyecto() {
       const input = document.getElementById("nuevoProyecto");
@@ -111,6 +127,19 @@
         li.textContent = input.value;
         listaTareas.appendChild(li);
         input.value = "";
+      }
+    }
+
+    function agregarAgenda() {
+      const dia = document.getElementById("dia-select").value;
+      const tarea = document.getElementById("tarea-dia").value;
+      if (dia && tarea.trim() !== "") {
+        const li = document.createElement("li");
+        li.textContent = `${dia}: ${tarea}`;
+        listaAgenda.appendChild(li);
+        document.getElementById("tarea-dia").value = "";
+      } else {
+        alert("Por favor, selecciona un día y escribe una tarea.");
       }
     }
   </script>

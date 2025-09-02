@@ -5,12 +5,12 @@ import { getFirestore, enableIndexedDbPersistence, collection, doc, setDoc, upda
 
 // Pega aquí tu configuración del paso 2.5
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROJECT_ID.firebaseapp.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_PROJECT_ID.appspot.com",
-  messagingSenderId: "XXXXXXXXXXXX",
-  appId: "1:XXXXXXXXXXXX:web:XXXXXXXXXXXXXX"
+  apiKey: "AIzaSyCRnF94BcH97yrsev6kWlbZZ4rIqjwsoNE",
+  authDomain: "gestion-zen-4849d.firebaseapp.com",
+  projectId: "gestion-zen-4849d",
+  storageBucket: "gestion-zen-4849d.appspot.com",   // <- así
+  messagingSenderId: "688322178199",
+  appId: "1:688322178199:web:188331a53cbd28409ccdd2"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

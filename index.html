@@ -1,133 +1,107 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestión Zen</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="script.js" defer></script>
-  <link href="https://unpkg.com/phosphor-icons@1.4.2/font/phosphor.css" rel="stylesheet" />
+  <meta name="description" content="Gestión Zen: clientes, proyectos, tareas y agenda en una sola vista." />
+  <meta name="theme-color" content="#0b6" />
+  <base href="/webaap/">
+  <link rel="manifest" href="/webaap/manifest.json" />
+  <link rel="stylesheet" href="/webaap/styles.css" />
 </head>
 <body>
-  <header>
-    <h1>🧘 Gestión Zen</h1>
-    <p>Tu espacio de control total para proyectos, tareas y clientes</p>
+  <noscript>Esta app requiere JavaScript.</noscript>
+
+  <header class="site-header">
+    <h1>Gestión Zen</h1>
+    <nav aria-label="Principal">
+      <button id="btnInstall" class="btn secondary" hidden>Instalar</button>
+    </nav>
   </header>
 
-  <main class="container">
-    <!-- Navegación por pestañas -->
-    <div class="tabs">
-      <button onclick="mostrarSeccion('inicio')">Inicio</button>
-      <button onclick="mostrarSeccion('agenda')">Agenda</button>
-      <button onclick="mostrarSeccion('proyectos')">Proyectos</button>
-      <button onclick="mostrarSeccion('tareas')">Tareas</button>
-      <button onclick="mostrarSeccion('clientes')">Clientes</button>
-    </div>
-<div id="detalle-dia" class="oculto">
-  <h3 id="titulo-dia"></h3>
-  <ul id="lista-dia"></ul>
-  <input id="nueva-tarea-dia" placeholder="Nueva tarea">
-  <button onclick="agregarTareaADiaActual()">Agregar</button>
-  <button onclick="cerrarDetalleDia()">Cerrar</button>
-</div>
-
-    <!-- Sección Inicio -->
-    <section id="inicio" class="seccion oculto">
-      <h2>📊 Resumen General</h2>
-      <div class="dashboard">
-        <div class="card">
-          <h3>Proyectos activos</h3>
-          <p id="resumenProyectos">0 proyectos</p>
+  <main id="main" class="container">
+    <section aria-labelledby="dash-title" class="card">
+      <h2 id="dash-title">Resumen</h2>
+      <div class="grid-4">
+        <div class="kpi">
+          <span class="kpi-label">Clientes</span>
+          <span class="kpi-value" id="kpi-clientes" aria-live="polite">0</span>
         </div>
-        <div class="card">
-          <h3>Tareas en progreso</h3>
-          <p id="resumenTareas">0 tareas</p>
+        <div class="kpi">
+          <span class="kpi-label">Proyectos</span>
+          <span class="kpi-value" id="kpi-proyectos" aria-live="polite">0</span>
         </div>
-        <div class="card">
-          <h3>Clientes registrados</h3>
-          <p id="resumenClientes">0 clientes</p>
+        <div class="kpi">
+          <span class="kpi-label">Tareas</span>
+          <span class="kpi-value" id="kpi-tareas" aria-live="polite">0</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Agenda</span>
+          <span class="kpi-value" id="kpi-agenda" aria-live="polite">0</span>
         </div>
       </div>
     </section>
 
-    <!-- Sección Agenda Semanal -->
-    <section id="agenda" class="seccion oculto">
-      <h2>🗓️ Agenda Semanal</h2>
-      <form id="form-agenda">
-        <select id="diaAgenda" required>
-          <option value="">Selecciona un día</option>
-          <option value="lunes">Lunes</option>
-          <option value="martes">Martes</option>
-          <option value="miércoles">Miércoles</option>
-          <option value="jueves">Jueves</option>
-          <option value="viernes">Viernes</option>
-          <option value="sábado">Sábado</option>
-          <option value="domingo">Domingo</option>
+    <section aria-labelledby="clientes-title" class="card">
+      <h2 id="clientes-title">Clientes</h2>
+      <form id="formCliente" class="row">
+        <label class="sr-only" for="cli-nombre">Nombre</label>
+        <input id="cli-nombre" name="nombre" required placeholder="Nombre del cliente" />
+        <select id="cli-estado" name="estado">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
         </select>
-        <input type="text" id="tareaAgenda" placeholder="Tarea para ese día" required />
-        <button type="submit">Agregar a Agenda</button>
+        <button class="btn">Añadir</button>
       </form>
-      <div class="agenda-semana">
-        <div class="dia" id="lunes"><h3>Lunes</h3><ul></ul></div>
-        <div class="dia" id="martes"><h3>Martes</h3><ul></ul></div>
-        <div class="dia" id="miércoles"><h3>Miércoles</h3><ul></ul></div>
-        <div class="dia" id="jueves"><h3>Jueves</h3><ul></ul></div>
-        <div class="dia" id="viernes"><h3>Viernes</h3><ul></ul></div>
-        <div class="dia" id="sábado"><h3>Sábado</h3><ul></ul></div>
-        <div class="dia" id="domingo"><h3>Domingo</h3><ul></ul></div>
-        <div id="fondo-modal" class="oculto"></div>
-      </div>
+      <ul id="lista-clientes" class="list"></ul>
     </section>
 
-    <!-- Sección Proyectos -->
-    <section id="proyectos" class="seccion">
-      <h2>📂 Proyectos</h2>
-      <form id="form-proyecto">
-        <input type="text" id="nuevoProyecto" placeholder="Nombre del proyecto" required />
-        <select id="selectorCliente" required>
-          <option value="">Selecciona un cliente</option>
+    <section aria-labelledby="proy-title" class="card">
+      <h2 id="proy-title">Proyectos</h2>
+      <form id="formProyecto" class="row">
+        <select id="proy-cliente" name="clienteId" required></select>
+        <input id="proy-titulo" name="titulo" required placeholder="Título del proyecto" />
+        <select id="proy-estado" name="estado">
+          <option value="abierto">Abierto</option>
+          <option value="en_progreso">En progreso</option>
+          <option value="cerrado">Cerrado</option>
         </select>
-        <button type="submit">Agregar Proyecto</button>
+        <button class="btn">Añadir</button>
       </form>
-      <ul id="listaProyectos"></ul>
+      <ul id="lista-proyectos" class="list"></ul>
     </section>
 
-    <!-- Sección Tareas -->
-    <section id="tareas" class="seccion oculto">
-      <h2>✅ Tareas</h2>
-      <form id="form-tarea">
-        <input type="text" id="nuevaTarea" placeholder="Descripción de la tarea" required />
-        <select id="estadoTarea">
-          <option value="pendiente">🟡 En preparación</option>
-          <option value="progreso">🟢 En progreso</option>
-          <option value="completada">✅ Completada</option>
+    <section aria-labelledby="tareas-title" class="card">
+      <h2 id="tareas-title">Tareas</h2>
+      <form id="formTarea" class="row">
+        <select id="tarea-proyecto" name="proyectoId" required></select>
+        <input id="tarea-titulo" name="titulo" required placeholder="Título de la tarea" />
+        <select id="tarea-estado" name="estado">
+          <option value="pendiente">Pendiente</option>
+          <option value="haciendo">Haciendo</option>
+          <option value="hecho">Hecho</option>
         </select>
-        <input type="number" id="porcentajeTarea" placeholder="% completado" min="0" max="100" />
-        <button type="submit">Agregar Tarea</button>
+        <button class="btn">Añadir</button>
       </form>
-      <ul id="listaTareas"></ul>
+      <ul id="lista-tareas" class="list"></ul>
     </section>
 
-    <!-- Sección Clientes -->
-    <section id="clientes" class="seccion oculto">
-      <h2>👥 Clientes</h2>
-      <form id="form-cliente">
-        <input type="text" id="empresaCliente" placeholder="Empresa" required />
-        <input type="text" id="contactoCliente" placeholder="Contacto" />
-        <input id="telefonoCliente" placeholder="Teléfono">
-<input id="emailCliente" placeholder="Email">
-<input id="direccionCliente" placeholder="Dirección">
-<select id="tipoCliente">
-  <option value="activo">Activo</option>
-  <option value="potencial">Potencial</option>
-  <option value="inactivo">Inactivo</option>
-</select>
-<input id="categoriaCliente" placeholder="Sector o categoría">
-        <textarea id="notasCliente" placeholder="Notas"></textarea>
-        <button type="submit">Agregar Cliente</button>
+    <section aria-labelledby="agenda-title" class="card">
+      <h2 id="agenda-title">Agenda</h2>
+      <form id="formAgenda" class="row">
+        <input id="ag-asunto" name="asunto" required placeholder="Asunto" />
+        <input id="ag-fecha" name="fecha" type="date" required />
+        <button class="btn">Añadir</button>
       </form>
-      <ul id="lista-clientes"></ul>
+      <ul id="lista-agenda" class="list"></ul>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <small>Local-first. PWA. Sin servidor.</small>
+  </footer>
+
+  <script defer src="/webaap/script.js"></script>
 </body>
 </html>

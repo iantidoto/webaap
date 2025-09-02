@@ -4,103 +4,177 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestión Zen</title>
-  <meta name="description" content="Gestión Zen: clientes, proyectos, tareas y agenda en una sola vista." />
+  <meta name="description" content="Panel de control: clientes, proyectos, tareas y agenda." />
   <meta name="theme-color" content="#0b6" />
   <base href="/webaap/">
   <link rel="manifest" href="/webaap/manifest.json" />
   <link rel="stylesheet" href="/webaap/styles.css" />
 </head>
 <body>
-  <noscript>Esta app requiere JavaScript.</noscript>
-
   <header class="site-header">
     <h1>Gestión Zen</h1>
-    <nav aria-label="Principal">
-      <button id="btnInstall" class="btn secondary" hidden>Instalar</button>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button role="tab" class="tab active" data-tab="tab-dashboard" aria-selected="true">Resumen</button>
+      <button role="tab" class="tab" data-tab="tab-clientes">Clientes</button>
+      <button role="tab" class="tab" data-tab="tab-proyectos">Proyectos</button>
+      <button role="tab" class="tab" data-tab="tab-tareas">Tareas</button>
+      <button role="tab" class="tab" data-tab="tab-agenda">Agenda</button>
+      <button id="btnInstall" class="btn secondary small" hidden>Instalar</button>
     </nav>
   </header>
 
   <main id="main" class="container">
-    <section aria-labelledby="dash-title" class="card">
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="panel active" aria-labelledby="dash-title">
       <h2 id="dash-title">Resumen</h2>
       <div class="grid-4">
-        <div class="kpi">
-          <span class="kpi-label">Clientes</span>
-          <span class="kpi-value" id="kpi-clientes" aria-live="polite">0</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Proyectos</span>
-          <span class="kpi-value" id="kpi-proyectos" aria-live="polite">0</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Tareas</span>
-          <span class="kpi-value" id="kpi-tareas" aria-live="polite">0</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Agenda</span>
-          <span class="kpi-value" id="kpi-agenda" aria-live="polite">0</span>
+        <div class="kpi"><span class="kpi-label">Clientes</span><span class="kpi-value" id="kpi-clientes">0</span></div>
+        <div class="kpi"><span class="kpi-label">Proyectos</span><span class="kpi-value" id="kpi-proyectos">0</span></div>
+        <div class="kpi"><span class="kpi-label">Tareas</span><span class="kpi-value" id="kpi-tareas">0</span></div>
+        <div class="kpi"><span class="kpi-label">Agenda</span><span class="kpi-value" id="kpi-agenda">0</span></div>
+      </div>
+      <div class="card mt">
+        <h3>Kanban rápido</h3>
+        <div class="kanban">
+          <div class="col" data-status="pendiente">
+            <h4>Pendiente</h4>
+            <div class="dropzone" id="kanban-pendiente"></div>
+          </div>
+          <div class="col" data-status="haciendo">
+            <h4>Haciendo</h4>
+            <div class="dropzone" id="kanban-haciendo"></div>
+          </div>
+          <div class="col" data-status="hecho">
+            <h4>Hecho</h4>
+            <div class="dropzone" id="kanban-hecho"></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section aria-labelledby="clientes-title" class="card">
+    <!-- CLIENTES -->
+    <section id="tab-clientes" class="panel" aria-labelledby="clientes-title">
       <h2 id="clientes-title">Clientes</h2>
-      <form id="formCliente" class="row">
-        <label class="sr-only" for="cli-nombre">Nombre</label>
-        <input id="cli-nombre" name="nombre" required placeholder="Nombre del cliente" />
-        <select id="cli-estado" name="estado">
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
-        <button class="btn">Añadir</button>
+      <form id="formCliente" class="card form-grid">
+        <input id="cli-nombre" name="nombre" required placeholder="Nombre fiscal" />
+        <input id="cli-nif" name="nif" placeholder="NIF/CIF" />
+        <input id="cli-email" name="email" type="email" placeholder="Email" />
+        <input id="cli-tel" name="tel" placeholder="Teléfono" />
+        <input id="cli-dir" name="dir" placeholder="Dirección" />
+        <input id="cli-cp" name="cp" placeholder="CP" />
+        <input id="cli-ciudad" name="ciudad" placeholder="Ciudad" />
+        <input id="cli-pais" name="pais" placeholder="País" />
+        <textarea id="cli-notas" name="notas" placeholder="Notas" rows="2"></textarea>
+        <div class="row end">
+          <select id="cli-estado" name="estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+          <button class="btn">Añadir cliente</button>
+        </div>
       </form>
-      <ul id="lista-clientes" class="list"></ul>
+
+      <div class="card">
+        <input id="filtro-clientes" class="w100" placeholder="Filtrar por nombre o NIF..." />
+        <ul id="lista-clientes" class="list mt"></ul>
+      </div>
     </section>
 
-    <section aria-labelledby="proy-title" class="card">
+    <!-- PROYECTOS -->
+    <section id="tab-proyectos" class="panel" aria-labelledby="proy-title">
       <h2 id="proy-title">Proyectos</h2>
-      <form id="formProyecto" class="row">
+      <form id="formProyecto" class="card form-grid">
         <select id="proy-cliente" name="clienteId" required></select>
         <input id="proy-titulo" name="titulo" required placeholder="Título del proyecto" />
-        <select id="proy-estado" name="estado">
-          <option value="abierto">Abierto</option>
-          <option value="en_progreso">En progreso</option>
-          <option value="cerrado">Cerrado</option>
-        </select>
-        <button class="btn">Añadir</button>
+        <input id="proy-inicio" type="date" name="inicio" />
+        <input id="proy-fin" type="date" name="fin" />
+        <input id="proy-presupuesto" name="presupuesto" type="number" min="0" step="0.01" placeholder="Presupuesto (€)" />
+        <textarea id="proy-desc" name="desc" placeholder="Descripción" rows="2"></textarea>
+        <div class="row end">
+          <select id="proy-estado" name="estado">
+            <option value="abierto">Abierto</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+          <button class="btn">Añadir proyecto</button>
+        </div>
       </form>
-      <ul id="lista-proyectos" class="list"></ul>
+
+      <div class="card">
+        <ul id="lista-proyectos" class="list"></ul>
+      </div>
     </section>
 
-    <section aria-labelledby="tareas-title" class="card">
+    <!-- TAREAS -->
+    <section id="tab-tareas" class="panel" aria-labelledby="tareas-title">
       <h2 id="tareas-title">Tareas</h2>
-      <form id="formTarea" class="row">
-        <select id="tarea-proyecto" name="proyectoId" required></select>
-        <input id="tarea-titulo" name="titulo" required placeholder="Título de la tarea" />
-        <select id="tarea-estado" name="estado">
-          <option value="pendiente">Pendiente</option>
-          <option value="haciendo">Haciendo</option>
-          <option value="hecho">Hecho</option>
+      <form id="formTarea" class="card form-grid">
+        <select id="tarea-proyecto" name="proyectoId">
+          <option value="">— Tarea libre —</option>
         </select>
-        <button class="btn">Añadir</button>
+        <input id="tarea-titulo" name="titulo" required placeholder="Título de la tarea" />
+        <input id="tarea-fecha" type="date" name="fecha" />
+        <textarea id="tarea-desc" name="desc" placeholder="Notas" rows="2"></textarea>
+        <div class="row end">
+          <select id="tarea-estado" name="estado">
+            <option value="pendiente">Pendiente</option>
+            <option value="haciendo">Haciendo</option>
+            <option value="hecho">Hecho</option>
+          </select>
+          <button class="btn">Añadir tarea</button>
+        </div>
       </form>
-      <ul id="lista-tareas" class="list"></ul>
+
+      <div class="kanban">
+        <div class="col" data-status="pendiente">
+          <h4>Pendiente</h4>
+          <div class="dropzone" id="list-pendiente"></div>
+        </div>
+        <div class="col" data-status="haciendo">
+          <h4>Haciendo</h4>
+          <div class="dropzone" id="list-haciendo"></div>
+        </div>
+        <div class="col" data-status="hecho">
+          <h4>Hecho</h4>
+          <div class="dropzone" id="list-hecho"></div>
+        </div>
+      </div>
     </section>
 
-    <section aria-labelledby="agenda-title" class="card">
+    <!-- AGENDA -->
+    <section id="tab-agenda" class="panel" aria-labelledby="agenda-title">
       <h2 id="agenda-title">Agenda</h2>
-      <form id="formAgenda" class="row">
+      <form id="formAgenda" class="card form-grid">
         <input id="ag-asunto" name="asunto" required placeholder="Asunto" />
         <input id="ag-fecha" name="fecha" type="date" required />
-        <button class="btn">Añadir</button>
+        <input id="ag-hora" name="hora" type="time" />
+        <textarea id="ag-notas" name="notas" placeholder="Notas" rows="2"></textarea>
+        <div class="row end">
+          <button class="btn">Añadir evento</button>
+        </div>
       </form>
-      <ul id="lista-agenda" class="list"></ul>
+
+      <div class="card">
+        <div class="agenda-grid" id="agenda-grid"></div>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <small>Local-first. PWA. Sin servidor.</small>
+    <small>Local-first. PWA.</small>
   </footer>
+
+  <!-- Modal genérico para edición -->
+  <dialog id="modal">
+    <form method="dialog" class="modal">
+      <h3 id="modal-title">Editar</h3>
+      <div id="modal-body"></div>
+      <div class="row end mt">
+        <button class="btn secondary" value="cancel">Cancelar</button>
+        <button class="btn" value="ok">Guardar</button>
+      </div>
+    </form>
+  </dialog>
 
   <script defer src="/webaap/script.js"></script>
 </body>

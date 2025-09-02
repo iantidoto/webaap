@@ -71,7 +71,9 @@ formCliente.addEventListener("submit", (e)=>{
   if(!data.nombre) return;
   state.clientes.push(data); save();
   formCliente.reset();
-  renderClientes(); renderProyectos(); // actualizar selects dependientes
+  renderClientes();
+  renderProyectos();
+  fillClientesSelect();               // <- ACTUALIZA SELECT EN PROYECTOS
 });
 
 filtroClientes.addEventListener("input", renderClientes);
@@ -101,18 +103,20 @@ listaClientes.addEventListener("click",(e)=>{
   const id = e.target?.dataset?.del || null;
   const eid = e.target?.dataset?.edit || null;
   if(id){
-    // Borrado en cascada: quita proyectos del cliente y tareas de esos proyectos
+    // Borrado en cascada
     const proys = state.proyectos.filter(p=>p.clienteId===id).map(p=>p.id);
     state.proyectos = state.proyectos.filter(p=>p.clienteId!==id);
     state.tareas = state.tareas.filter(t=>!proys.includes(t.proyectoId));
     state.clientes = state.clientes.filter(c=>c.id!==id);
     save(); renderClientes(); renderProyectos(); renderKanban();
+    fillClientesSelect();             // <- MANTIENE SELECT COHERENTE
   }
   if(eid){
     const c = byId(state.clientes,eid); if(!c) return;
     openModal("Editar cliente", clienteForm(c), (vals)=>{
       Object.assign(c, vals);
       save(); renderClientes(); renderProyectos();
+      fillClientesSelect();           // <- REFRESCA SELECT TRAS EDITAR
     });
   }
 });
@@ -245,7 +249,6 @@ function taskCard(t){
   div.innerHTML = `<strong>${t.titulo}</strong><div class="meta">${proy?proy.titulo:"Tarea libre"} · ${t.fecha||""}</div>
     <div class="actions mt"><button class="btn secondary small" data-edit="${t.id}">Editar</button>
     <button class="btn secondary small" data-del="${t.id}">Eliminar</button></div>`;
-  // drag
   div.addEventListener("dragstart", ev=>{ div.classList.add("drag"); ev.dataTransfer.setData("text/plain", t.id); });
   div.addEventListener("dragend", ()=>div.classList.remove("drag"));
   return div;
@@ -258,7 +261,6 @@ function renderKanban(){
     zone.innerHTML="";
     state.tareas.filter(t=>t.estado===s).forEach(t=> zone.appendChild(taskCard(t)));
   });
-  // dashboard mini
   ["pendiente","haciendo","hecho"].forEach(s=>{
     const zone = document.getElementById(`kanban-${s}`);
     if(zone) {
@@ -384,8 +386,7 @@ function openModal(title, schema, onOK){
   schema.forEach(f=>{
     let el;
     if(f.type==="textarea"){
-      el=document.createElement("textarea");
-      el.rows=2;
+      el=document.createElement("textarea"); el.rows=3;
     }else if(f.type==="select"){
       el=document.createElement("select");
       (f.options||[]).forEach(([val,label])=>{
@@ -423,12 +424,12 @@ function openModal(title, schema, onOK){
   }
 }
 
-// ---------- Selects dependientes y primeras pinturas ----------
+// ---------- Arranque ----------
 function boot(){
   updateKPIs();
   renderClientes();
   renderProyectos();
-  fillClientesSelect();
+  fillClientesSelect();          // <- asegura select inicial
   fillProyectoSelectInTareas();
   renderKanban();
   renderAgenda();

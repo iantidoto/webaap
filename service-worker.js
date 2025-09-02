@@ -1,5 +1,5 @@
 /* Cache básico con actualización en segundo plano */
-const VERSION = "gz-v1";
+const VERSION = "gz-v2";
 const APP_SHELL = [
   "/webaap/",
   "/webaap/index.html",

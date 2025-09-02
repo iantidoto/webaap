@@ -1,6 +1,8 @@
 :root{
   --bg:#0a0a0a; --card:#121212; --muted:#9aa0a6; --text:#e8eaed;
-  --accent:#00bb66; --border:#1f1f1f; --radius:14px; --pad:14px; --gap:14px;
+  --border:#2a2a2a; --radius:14px; --pad:14px; --gap:14px;
+  --btn:#ffffff; --btnText:#000000; --btnBorder:#3a3a3a;
+  --fieldBg:#f5f5f5; --fieldText:#111; --ph:#666;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Noto Sans";
 }
 *{box-sizing:border-box}
@@ -12,13 +14,16 @@ body{margin:0;background:var(--bg);color:var(--text)}
 .mt{margin-top:var(--gap)}
 .w100{width:100%}
 
+/* Tabs */
 .tabs{display:flex;gap:8px;flex-wrap:wrap}
 .tab{background:#111;color:var(--text);border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
-.tab.active{border-color:var(--accent)}
+.tab.active{border-color:#fff}
 
+/* Panels */
 .panel{display:none}
 .panel.active{display:block}
 
+/* Cards y layout */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--pad);margin-top:var(--gap)}
 .grid-4{display:grid;gap:var(--gap);grid-template-columns:repeat(4,1fr)}
 @media (max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr)}}
@@ -28,35 +33,48 @@ body{margin:0;background:var(--bg);color:var(--text)}
 .kpi-label{color:var(--muted);font-size:12px}
 .kpi-value{font-size:28px;font-weight:700}
 
+/* Formularios */
 .form-grid{display:grid;gap:var(--gap);grid-template-columns:repeat(4,1fr)}
 .form-grid textarea{grid-column:1 / -1}
 .form-grid .row.end{grid-column:1 / -1;display:flex;justify-content:flex-end;gap:var(--gap)}
 @media (max-width:900px){.form-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.form-grid{grid-template-columns:1fr}}
 
-input,select,textarea,button{
-  background:#111;border:1px solid var(--border);color:var(--text);
-  padding:10px 12px;border-radius:10px
+input,select,textarea{
+  background:var(--fieldBg); color:var(--fieldText);
+  border:1px solid var(--btnBorder); border-radius:10px; padding:10px 12px
 }
-input::placeholder,textarea::placeholder{color:#6b6b6b}
-button.btn{background:var(--accent);border:none;color:#001e0f;font-weight:700;cursor:pointer}
-button.btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
+input::placeholder,textarea::placeholder{color:var(--ph)}
+button.btn{
+  background:var(--btn); color:var(--btnText);
+  border:1px solid var(--btnBorder); border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer
+}
+button.btn.secondary{
+  background:transparent; color:#f0f0f0; border:1px solid #555
+}
 button.small{padding:6px 8px;font-size:12px}
 
+/* Listas */
 .list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:10px}
 .item .meta{color:var(--muted);font-size:12px}
 .actions{display:flex;gap:8px}
 
+/* Kanban */
 .kanban{display:grid;gap:var(--gap);grid-template-columns:repeat(3,1fr)}
 .col{background:#101010;border:1px dashed var(--border);border-radius:12px;padding:10px}
 .dropzone{min-height:160px;display:grid;gap:10px}
 .card-task{padding:10px;border:1px solid var(--border);border-radius:8px;background:#151515;cursor:grab}
 .card-task.drag{opacity:.6}
 
+/* Agenda */
 .agenda-grid{display:grid;gap:10px}
 .agenda-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:10px}
 
-.modal{min-width:320px;max-width:520px}
-dialog{border:none;border-radius:12px;padding:0}
+/* Modal grande y sin scroll lateral */
+dialog{border:none;border-radius:12px;padding:0; width:90vw; max-width:1000px;}
 dialog::backdrop{background:rgba(0,0,0,.6)}
+.modal{padding:var(--pad); max-height:85vh; overflow:auto}
+#modal-body .form-grid{grid-template-columns:repeat(3,1fr)}
+@media (max-width:900px){#modal-body .form-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){#modal-body .form-grid{grid-template-columns:1fr}}

@@ -1,31 +1,37 @@
-// ---------- Config ----------
-const BASE = "/webaap/";
-const DB_KEY = "gz_state_v2";
+// ---------- Firebase (ESM desde CDN) ----------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, enableIndexedDbPersistence, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ---------- Estado ----------
-const defaults = {
-  clientes: [], // {id,nombre,nif,email,tel,dir,cp,ciudad,pais,notas,estado}
-  proyectos: [], // {id,clienteId,titulo,inicio,fin,presupuesto,desc,estado}
-  tareas: [],    // {id,proyectoId,titulo,fecha,desc,estado}
-  agenda: []     // {id,asunto,fecha,hora,notas}
+// Pega aquí tu configuración del paso 2.5
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT_ID.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_PROJECT_ID.appspot.com",
+  messagingSenderId: "XXXXXXXXXXXX",
+  appId: "1:XXXXXXXXXXXX:web:XXXXXXXXXXXXXX"
 };
-const state = load();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+enableIndexedDbPersistence(db).catch(()=>{});
 
-function load(){
-  try{ const raw=localStorage.getItem(DB_KEY); return raw? JSON.parse(raw): structuredClone(defaults);}catch{ return structuredClone(defaults); }
-}
-function save(){
-  localStorage.setItem(DB_KEY, JSON.stringify(state));
-  updateKPIs();
-  renderKanban();
-}
+// ---------- Config local ----------
+const BASE = "/webaap/";
+const DB_KEY = "gz_state_v3";
+
+// ---------- Estado local ----------
+const defaults = { clientes: [], proyectos: [], tareas: [], agenda: [] };
+const state = loadLocal();
+function loadLocal(){ try{const raw=localStorage.getItem(DB_KEY); return raw?JSON.parse(raw):structuredClone(defaults);}catch{ return structuredClone(defaults); } }
+function saveLocal(){ localStorage.setItem(DB_KEY, JSON.stringify(state)); updateKPIs(); renderKanban(); }
 
 // ---------- Utilidades ----------
 const $=(s,sc=document)=>sc.querySelector(s);
 const $$=(s,sc=document)=>Array.from(sc.querySelectorAll(s));
 const uid=()=>crypto.randomUUID();
-
-function fmtMoney(n){ if(n==null || n==="") return ""; return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Number(n)); }
+function fmtMoney(n){ if(n==null||n==="")return""; return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"}).format(Number(n)); }
 function byId(arr,id){ return arr.find(x=>x.id===id); }
 
 // ---------- Tabs ----------
@@ -48,14 +54,77 @@ function updateKPIs(){
   $("#kpi-agenda").textContent = state.agenda.length;
 }
 
+// ---------- AUTH UI ----------
+const btnLogin=$("#btnLogin"), btnLogout=$("#btnLogout"), userEmail=$("#userEmail");
+const authDialog=$("#authDialog"); const btnDoLogin=$("#btnDoLogin");
+btnLogin.addEventListener("click", ()=>authDialog.showModal());
+btnDoLogin.addEventListener("click", async ()=>{
+  if(authDialog.returnValue!=="ok") return;
+  const email=$("#authEmail").value.trim(); const pass=$("#authPass").value;
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+  }catch(e){
+    if(e.code==="auth/user-not-found"){ await createUserWithEmailAndPassword(auth,email,pass); }
+    else throw e;
+  }
+});
+btnLogout.addEventListener("click", ()=>signOut(auth));
+
+let unsub = { clientes:null, proyectos:null, tareas:null, agenda:null };
+async function ensureMigration(uid){
+  const cols=["clientes","proyectos","tareas","agenda"];
+  const sizes = await Promise.all(cols.map(async c => (await getDocs(collection(db,"users",uid,c))).size));
+  const empty = sizes.every(s=>s===0);
+  if(!empty) return;
+  const batch = writeBatch(db);
+  state.clientes.forEach(x=>{ const id=x.id||uid(); const {id:_,...rest}=x; batch.set(doc(db,"users",uid,"clientes",id), rest); });
+  state.proyectos.forEach(x=>{ const id=x.id||uid(); const {id:_,...rest}=x; batch.set(doc(db,"users",uid,"proyectos",id), rest); });
+  state.tareas.forEach(x=>{ const id=x.id||uid(); const {id:_,...rest}=x; batch.set(doc(db,"users",uid,"tareas",id), rest); });
+  state.agenda.forEach(x=>{ const id=x.id||uid(); const {id:_,...rest}=x; batch.set(doc(db,"users",uid,"agenda",id), rest); });
+  await batch.commit();
+}
+function bindRealtime(uid){
+  // limpia previas
+  Object.values(unsub).forEach(f=>f&&f());
+  unsub.clientes = onSnapshot(collection(db,"users",uid,"clientes"), snap=>{
+    state.clientes = snap.docs.map(d=>({id:d.id,...d.data()}));
+    saveLocal(); renderClientes(); renderProyectos(); fillClientesSelect(); fillProyectoSelectInTareas();
+  });
+  unsub.proyectos = onSnapshot(collection(db,"users",uid,"proyectos"), snap=>{
+    state.proyectos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    saveLocal(); renderProyectos(); fillProyectoSelectInTareas(); renderKanban();
+  });
+  unsub.tareas = onSnapshot(collection(db,"users",uid,"tareas"), snap=>{
+    state.tareas = snap.docs.map(d=>({id:d.id,...d.data()}));
+    saveLocal(); renderKanban();
+  });
+  unsub.agenda = onSnapshot(collection(db,"users",uid,"agenda"), snap=>{
+    state.agenda = snap.docs.map(d=>({id:d.id,...d.data()}));
+    saveLocal(); renderAgenda();
+  });
+}
+
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    userEmail.textContent = user.email || "Conectado";
+    btnLogin.hidden = true; btnLogout.hidden = false;
+    await ensureMigration(user.uid);
+    bindRealtime(user.uid);
+  }else{
+    userEmail.textContent = "";
+    btnLogin.hidden = false; btnLogout.hidden = true;
+    // sin login trabajas local
+  }
+});
+
 // ---------- CLIENTES ----------
 const formCliente = $("#formCliente");
 const listaClientes = $("#lista-clientes");
 const filtroClientes = $("#filtro-clientes");
 
-formCliente.addEventListener("submit", (e)=>{
+formCliente.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const data = {
+  const c = {
     id: uid(),
     nombre: $("#cli-nombre").value.trim(),
     nif: $("#cli-nif").value.trim(),
@@ -68,12 +137,13 @@ formCliente.addEventListener("submit", (e)=>{
     notas: $("#cli-notas").value.trim(),
     estado: $("#cli-estado").value
   };
-  if(!data.nombre) return;
-  state.clientes.push(data); save();
+  if(!c.nombre) return;
+  state.clientes.push(c); saveLocal(); renderClientes(); renderProyectos(); fillClientesSelect();
+  if(auth.currentUser){
+    const {id,...rest}=c;
+    await setDoc(doc(db,"users",auth.currentUser.uid,"clientes",id), rest);
+  }
   formCliente.reset();
-  renderClientes();
-  renderProyectos();
-  fillClientesSelect();               // <- ACTUALIZA SELECT EN PROYECTOS
 });
 
 filtroClientes.addEventListener("input", renderClientes);
@@ -99,28 +169,32 @@ function renderClientes(){
       listaClientes.appendChild(li);
     });
 }
-listaClientes.addEventListener("click",(e)=>{
+listaClientes.addEventListener("click", async (e)=>{
   const id = e.target?.dataset?.del || null;
   const eid = e.target?.dataset?.edit || null;
   if(id){
-    // Borrado en cascada
     const proys = state.proyectos.filter(p=>p.clienteId===id).map(p=>p.id);
     state.proyectos = state.proyectos.filter(p=>p.clienteId!==id);
     state.tareas = state.tareas.filter(t=>!proys.includes(t.proyectoId));
     state.clientes = state.clientes.filter(c=>c.id!==id);
-    save(); renderClientes(); renderProyectos(); renderKanban();
-    fillClientesSelect();             // <- MANTIENE SELECT COHERENTE
+    saveLocal(); renderClientes(); renderProyectos(); renderKanban(); fillClientesSelect();
+    if(auth.currentUser){
+      await deleteDoc(doc(db,"users",auth.currentUser.uid,"clientes",id));
+      await Promise.all(proys.map(pid=>deleteDoc(doc(db,"users",auth.currentUser.uid,"proyectos",pid))));
+      // tareas en cascada se actualizarán por snapshot cuando se borren proyectos
+    }
   }
   if(eid){
     const c = byId(state.clientes,eid); if(!c) return;
-    openModal("Editar cliente", clienteForm(c), (vals)=>{
-      Object.assign(c, vals);
-      save(); renderClientes(); renderProyectos();
-      fillClientesSelect();           // <- REFRESCA SELECT TRAS EDITAR
+    openModal("Editar cliente", clienteForm(c), async (vals)=>{
+      Object.assign(c, vals); saveLocal(); renderClientes(); renderProyectos(); fillClientesSelect();
+      if(auth.currentUser){
+        const {id,...rest}=c;
+        await setDoc(doc(db,"users",auth.currentUser.uid,"clientes",id), rest); // upsert
+      }
     });
   }
 });
-
 function clienteForm(c={}){
   return [
     {k:"nombre",label:"Nombre fiscal",type:"text",required:true,val:c.nombre||""},
@@ -129,7 +203,7 @@ function clienteForm(c={}){
     {k:"tel",label:"Teléfono",type:"text",val:c.tel||""},
     {k:"dir",label:"Dirección",type:"text",val:c.dir||""},
     {k:"cp",label:"CP",type:"text",val:c.cp||""},
-    {k:"ciudad",label:"Ciudad",type:"text",val: c.ciudad||""},
+    {k:"ciudad",label:"Ciudad",type:"text",val:c.ciudad||""},
     {k:"pais",label:"País",type:"text",val:c.pais||""},
     {k:"estado",label:"Estado",type:"select",options:[["activo","Activo"],["inactivo","Inactivo"]],val:c.estado||"activo"},
     {k:"notas",label:"Notas",type:"textarea",val:c.notas||""}
@@ -145,7 +219,7 @@ function fillClientesSelect(){
   selProyCliente.innerHTML = `<option value="" disabled selected>Cliente</option>` +
     state.clientes.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join("");
 }
-formProyecto.addEventListener("submit",(e)=>{
+formProyecto.addEventListener("submit", async (e)=>{
   e.preventDefault();
   const p = {
     id: uid(),
@@ -158,55 +232,56 @@ formProyecto.addEventListener("submit",(e)=>{
     estado: $("#proy-estado").value
   };
   if(!p.clienteId || !p.titulo) return;
-  state.proyectos.push(p); save();
+  state.proyectos.push(p); saveLocal(); renderProyectos(); fillProyectoSelectInTareas();
+  if(auth.currentUser){
+    const {id,...rest}=p;
+    await setDoc(doc(db,"users",auth.currentUser.uid,"proyectos",id), rest);
+  }
   formProyecto.reset();
-  renderProyectos(); fillProyectoSelectInTareas();
 });
-
 function renderProyectos(){
   listaProyectos.innerHTML="";
-  state.proyectos
-    .slice()
-    .sort((a,b)=>a.titulo.localeCompare(b.titulo))
-    .forEach(p=>{
-      const cli = byId(state.clientes,p.clienteId);
-      const li = document.createElement("li");
-      li.className="item";
-      li.innerHTML = `
-        <div>
-          <strong>${p.titulo}</strong>
-          <div class="meta">${cli?cli.nombre:"¿cliente?"} · ${p.estado} · ${fmtMoney(p.presupuesto)}</div>
-        </div>
-        <div class="actions">
-          <button class="btn secondary small" data-edit="${p.id}">Editar</button>
-          <button class="btn secondary small" data-del="${p.id}">Eliminar</button>
-        </div>`;
-      listaProyectos.appendChild(li);
-    });
+  state.proyectos.slice().sort((a,b)=>a.titulo.localeCompare(b.titulo)).forEach(p=>{
+    const cli = byId(state.clientes,p.clienteId);
+    const li = document.createElement("li");
+    li.className="item";
+    li.innerHTML = `
+      <div>
+        <strong>${p.titulo}</strong>
+        <div class="meta">${cli?cli.nombre:"¿cliente?"} · ${p.estado} · ${fmtMoney(p.presupuesto)}</div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary small" data-edit="${p.id}">Editar</button>
+        <button class="btn secondary small" data-del="${p.id}">Eliminar</button>
+      </div>`;
+    listaProyectos.appendChild(li);
+  });
 }
-listaProyectos.addEventListener("click",(e)=>{
+listaProyectos.addEventListener("click", async (e)=>{
   const id=e.target?.dataset?.del||null;
   const eid=e.target?.dataset?.edit||null;
   if(id){
     state.tareas = state.tareas.filter(t=>t.proyectoId!==id);
     state.proyectos = state.proyectos.filter(p=>p.id!==id);
-    save(); renderProyectos(); renderKanban();
-    fillProyectoSelectInTareas();
+    saveLocal(); renderProyectos(); renderKanban(); fillProyectoSelectInTareas();
+    if(auth.currentUser){
+      await deleteDoc(doc(db,"users",auth.currentUser.uid,"proyectos",id));
+    }
   }
   if(eid){
     const p = byId(state.proyectos,eid); if(!p) return;
-    openModal("Editar proyecto", proyectoForm(p), (vals)=>{
-      Object.assign(p, vals);
-      save(); renderProyectos(); renderKanban();
-      fillProyectoSelectInTareas();
+    openModal("Editar proyecto", proyectoForm(p), async (vals)=>{
+      Object.assign(p, vals); saveLocal(); renderProyectos(); renderKanban(); fillProyectoSelectInTareas();
+      if(auth.currentUser){
+        const {id,...rest}=p;
+        await setDoc(doc(db,"users",auth.currentUser.uid,"proyectos",id), rest);
+      }
     });
   }
 });
-
 function proyectoForm(p={}){
   return [
-    {k:"clienteId",label:"Cliente",type:"select",
-      options: state.clientes.map(c=>[c.id,c.nombre]), val:p.clienteId||""},
+    {k:"clienteId",label:"Cliente",type:"select",options: state.clientes.map(c=>[c.id,c.nombre]), val:p.clienteId||""},
     {k:"titulo",label:"Título",type:"text",required:true,val:p.titulo||""},
     {k:"inicio",label:"Inicio",type:"date",val:p.inicio||""},
     {k:"fin",label:"Fin",type:"date",val:p.fin||""},
@@ -219,33 +294,25 @@ function proyectoForm(p={}){
 // ---------- TAREAS + KANBAN ----------
 const formTarea = $("#formTarea");
 const selTareaProyecto = $("#tarea-proyecto");
-
 function fillProyectoSelectInTareas(){
   selTareaProyecto.innerHTML = `<option value="">— Tarea libre —</option>` +
     state.proyectos.map(p=>`<option value="${p.id}">${p.titulo}</option>`).join("");
 }
-formTarea.addEventListener("submit",(e)=>{
+formTarea.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const t = {
-    id: uid(),
-    proyectoId: $("#tarea-proyecto").value || "",
-    titulo: $("#tarea-titulo").value.trim(),
-    fecha: $("#tarea-fecha").value || "",
-    desc: $("#tarea-desc").value.trim(),
-    estado: $("#tarea-estado").value
-  };
+  const t = { id: uid(), proyectoId: $("#tarea-proyecto").value || "", titulo: $("#tarea-titulo").value.trim(), fecha: $("#tarea-fecha").value || "", desc: $("#tarea-desc").value.trim(), estado: $("#tarea-estado").value };
   if(!t.titulo) return;
-  state.tareas.push(t); save();
+  state.tareas.push(t); saveLocal(); renderKanban();
+  if(auth.currentUser){
+    const {id,...rest}=t;
+    await setDoc(doc(db,"users",auth.currentUser.uid,"tareas",id), rest);
+  }
   formTarea.reset();
-  renderKanban();
 });
-
 function taskCard(t){
   const proy = t.proyectoId ? byId(state.proyectos,t.proyectoId) : null;
   const div = document.createElement("div");
-  div.className="card-task";
-  div.draggable=true;
-  div.dataset.id=t.id;
+  div.className="card-task"; div.draggable=true; div.dataset.id=t.id;
   div.innerHTML = `<strong>${t.titulo}</strong><div class="meta">${proy?proy.titulo:"Tarea libre"} · ${t.fecha||""}</div>
     <div class="actions mt"><button class="btn secondary small" data-edit="${t.id}">Editar</button>
     <button class="btn secondary small" data-del="${t.id}">Eliminar</button></div>`;
@@ -253,59 +320,49 @@ function taskCard(t){
   div.addEventListener("dragend", ()=>div.classList.remove("drag"));
   return div;
 }
-
 function renderKanban(){
   ["pendiente","haciendo","hecho"].forEach(s=>{
     const zone = document.getElementById(`list-${s}`) || document.getElementById(`kanban-${s}`);
-    if(!zone) return;
-    zone.innerHTML="";
+    if(!zone) return; zone.innerHTML="";
     state.tareas.filter(t=>t.estado===s).forEach(t=> zone.appendChild(taskCard(t)));
   });
   ["pendiente","haciendo","hecho"].forEach(s=>{
     const zone = document.getElementById(`kanban-${s}`);
-    if(zone) {
-      zone.innerHTML="";
-      state.tareas.filter(t=>t.estado===s).slice(0,5).forEach(t=> zone.appendChild(taskCard(t)));
-    }
+    if(zone){ zone.innerHTML=""; state.tareas.filter(t=>t.estado===s).slice(0,5).forEach(t=> zone.appendChild(taskCard(t))); }
   });
 }
-
 $$(".dropzone").forEach(zone=>{
   zone.addEventListener("dragover", e=>{ e.preventDefault(); });
-  zone.addEventListener("drop", e=>{
+  zone.addEventListener("drop", async e=>{
     e.preventDefault();
     const id = e.dataTransfer.getData("text/plain");
     const t = byId(state.tareas,id); if(!t) return;
-    const col = zone.closest(".col");
-    const status = col?.dataset?.status;
-    if(status){ t.estado = status; save(); renderKanban(); }
+    const status = zone.closest(".col")?.dataset?.status; if(!status) return;
+    t.estado = status; saveLocal(); renderKanban();
+    if(auth.currentUser){ await updateDoc(doc(db,"users",auth.currentUser.uid,"tareas",id), {estado:status}); }
   });
 });
-
-// acciones de tarjeta
-document.addEventListener("click",(e)=>{
+// acciones tarjeta
+document.addEventListener("click", async (e)=>{
   const del = e.target?.dataset?.del;
   const edit = e.target?.dataset?.edit;
   if(del){
-    const tIndex = state.tareas.findIndex(x=>x.id===del);
-    if(tIndex>-1){ state.tareas.splice(tIndex,1); save(); renderKanban(); return; }
+    const i = state.tareas.findIndex(x=>x.id===del);
+    if(i>-1){ state.tareas.splice(i,1); saveLocal(); renderKanban(); if(auth.currentUser){ await deleteDoc(doc(db,"users",auth.currentUser.uid,"tareas",del)); } }
   }
   if(edit){
-    const t = byId(state.tareas,edit);
-    if(t){
-      openModal("Editar tarea", tareaForm(t), (vals)=>{
-        Object.assign(t, vals);
-        save(); renderKanban();
+    const t = byId(state.tareas,edit); if(t){
+      openModal("Editar tarea", tareaForm(t), async (vals)=>{
+        Object.assign(t, vals); saveLocal(); renderKanban();
+        if(auth.currentUser){ const {id,...rest}=t; await setDoc(doc(db,"users",auth.currentUser.uid,"tareas",id), rest); }
       });
     }
   }
 });
-
 function tareaForm(t={}){
   return [
     {k:"titulo",label:"Título",type:"text",required:true,val:t.titulo||""},
-    {k:"proyectoId",label:"Proyecto",type:"select",
-      options:[["","— Tarea libre —"], ...state.proyectos.map(p=>[p.id,p.titulo])], val:t.proyectoId||""},
+    {k:"proyectoId",label:"Proyecto",type:"select",options:[["","— Tarea libre —"], ...state.proyectos.map(p=>[p.id,p.titulo])], val:t.proyectoId||""},
     {k:"fecha",label:"Fecha",type:"date",val:t.fecha||""},
     {k:"estado",label:"Estado",type:"select",options:[["pendiente","Pendiente"],["haciendo","Haciendo"],["hecho","Hecho"]],val:t.estado||"pendiente"},
     {k:"desc",label:"Notas",type:"textarea",val:t.desc||""}
@@ -315,138 +372,75 @@ function tareaForm(t={}){
 // ---------- AGENDA ----------
 const formAgenda=$("#formAgenda");
 const agendaGrid=$("#agenda-grid");
-formAgenda.addEventListener("submit",(e)=>{
+formAgenda.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const a = {
-    id: uid(),
-    asunto: $("#ag-asunto").value.trim(),
-    fecha: $("#ag-fecha").value,
-    hora: $("#ag-hora").value || "",
-    notas: $("#ag-notas").value.trim()
-  };
+  const a = { id: uid(), asunto: $("#ag-asunto").value.trim(), fecha: $("#ag-fecha").value, hora: $("#ag-hora").value || "", notas: $("#ag-notas").value.trim() };
   if(!a.asunto || !a.fecha) return;
-  state.agenda.push(a); save();
+  state.agenda.push(a); saveLocal(); renderAgenda();
+  if(auth.currentUser){ const {id,...rest}=a; await setDoc(doc(db,"users",auth.currentUser.uid,"agenda",id), rest); }
   formAgenda.reset();
-  renderAgenda();
 });
-
 function renderAgenda(){
   agendaGrid.innerHTML="";
-  state.agenda
-    .slice()
-    .sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora))
-    .forEach(a=>{
-      const row = document.createElement("div");
-      row.className="agenda-item";
-      row.innerHTML = `
-        <div>
-          <strong>${a.asunto}</strong>
-          <div class="meta">${a.fecha} ${a.hora||""}</div>
-          ${a.notas? `<div class="meta">${a.notas}</div>`:""}
-        </div>
-        <div class="actions">
-          <button class="btn secondary small" data-edit="${a.id}">Editar</button>
-          <button class="btn secondary small" data-del="${a.id}">Eliminar</button>
-        </div>`;
-      agendaGrid.appendChild(row);
-    });
+  state.agenda.slice().sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora)).forEach(a=>{
+    const row = document.createElement("div");
+    row.className="agenda-item";
+    row.innerHTML = `
+      <div><strong>${a.asunto}</strong><div class="meta">${a.fecha} ${a.hora||""}</div>${a.notas? `<div class="meta">${a.notas}</div>`:""}</div>
+      <div class="actions"><button class="btn secondary small" data-edit="${a.id}">Editar</button><button class="btn secondary small" data-del="${a.id}">Eliminar</button></div>`;
+    agendaGrid.appendChild(row);
+  });
 }
-agendaGrid.addEventListener("click",(e)=>{
-  const id=e.target?.dataset?.del||null;
-  const eid=e.target?.dataset?.edit||null;
+agendaGrid.addEventListener("click", async (e)=>{
+  const id=e.target?.dataset?.del||null; const eid=e.target?.dataset?.edit||null;
   if(id){
-    state.agenda = state.agenda.filter(x=>x.id!==id); save(); renderAgenda();
+    state.agenda = state.agenda.filter(x=>x.id!==id); saveLocal(); renderAgenda();
+    if(auth.currentUser){ await deleteDoc(doc(db,"users",auth.currentUser.uid,"agenda",id)); }
   }
   if(eid){
     const a = byId(state.agenda,eid); if(!a) return;
-    openModal("Editar evento", agendaForm(a), (vals)=>{
-      Object.assign(a, vals); save(); renderAgenda();
+    openModal("Editar evento", agendaForm(a), async (vals)=>{
+      Object.assign(a, vals); saveLocal(); renderAgenda();
+      if(auth.currentUser){ const {id,...rest}=a; await setDoc(doc(db,"users",auth.currentUser.uid,"agenda",id), rest); }
     });
   }
 });
-function agendaForm(a={}){
-  return [
-    {k:"asunto",label:"Asunto",type:"text",required:true,val:a.asunto||""},
-    {k:"fecha",label:"Fecha",type:"date",required:true,val:a.fecha||""},
-    {k:"hora",label:"Hora",type:"time",val:a.hora||""},
-    {k:"notas",label:"Notas",type:"textarea",val:a.notas||""}
-  ];
-}
+function agendaForm(a={}){ return [
+  {k:"asunto",label:"Asunto",type:"text",required:true,val:a.asunto||""},
+  {k:"fecha",label:"Fecha",type:"date",required:true,val:a.fecha||""},
+  {k:"hora",label:"Hora",type:"time",val:a.hora||""},
+  {k:"notas",label:"Notas",type:"textarea",val:a.notas||""}
+]; }
 
 // ---------- Modal genérico ----------
-const modal = $("#modal");
-const modalBody = $("#modal-body");
-const modalTitle = $("#modal-title");
-
+const modal = $("#modal"); const modalBody = $("#modal-body"); const modalTitle = $("#modal-title");
 function openModal(title, schema, onOK){
-  modalTitle.textContent = title;
-  modalBody.innerHTML = "";
-  const form = document.createElement("form");
-  form.className="form-grid";
+  modalTitle.textContent = title; modalBody.innerHTML = "";
+  const form = document.createElement("form"); form.className="form-grid";
   schema.forEach(f=>{
     let el;
-    if(f.type==="textarea"){
-      el=document.createElement("textarea"); el.rows=3;
-    }else if(f.type==="select"){
-      el=document.createElement("select");
-      (f.options||[]).forEach(([val,label])=>{
-        const opt=document.createElement("option");
-        opt.value=val; opt.textContent=label;
-        if(String(f.val)===String(val)) opt.selected=true;
-        el.appendChild(opt);
-      });
-    }else{
-      el=document.createElement("input");
-      el.type=f.type||"text";
-      if(f.type==="number"){ el.step="0.01"; }
-      el.value=f.val||"";
-    }
-    el.id="m-"+f.k; el.name=f.k;
-    if(f.required) el.required=true;
-    el.placeholder=f.label;
-    const wrap=document.createElement("div");
-    const lab=document.createElement("label"); lab.htmlFor=el.id; lab.textContent=f.label;
-    wrap.appendChild(lab); wrap.appendChild(el);
+    if(f.type==="textarea"){ el=document.createElement("textarea"); el.rows=3; }
+    else if(f.type==="select"){ el=document.createElement("select"); (f.options||[]).forEach(([val,label])=>{ const opt=document.createElement("option"); opt.value=val; opt.textContent=label; if(String(f.val)===String(val)) opt.selected=true; el.appendChild(opt); }); }
+    else{ el=document.createElement("input"); el.type=f.type||"text"; if(f.type==="number"){ el.step="0.01"; } el.value=f.val||""; }
+    el.id="m-"+f.k; el.name=f.k; if(f.required) el.required=true; el.placeholder=f.label;
+    const wrap=document.createElement("div"); const lab=document.createElement("label"); lab.htmlFor=el.id; lab.textContent=f.label; wrap.appendChild(lab); wrap.appendChild(el);
     form.appendChild(wrap);
   });
-  modalBody.appendChild(form);
-  modal.showModal();
-
+  modalBody.appendChild(form); modal.showModal();
   modal.addEventListener("close", handler, {once:true});
-  function handler(){
-    if(modal.returnValue!=="ok") return;
-    const vals={};
-    schema.forEach(f=>{
-      const v = form.elements[f.k].value;
-      vals[f.k]=v;
-    });
-    onOK?.(vals);
-  }
+  function handler(){ if(modal.returnValue!=="ok") return; const vals={}; schema.forEach(f=>{ vals[f.k]=form.elements[f.k].value; }); onOK?.(vals); }
 }
 
-// ---------- Arranque ----------
+// ---------- Boot ----------
 function boot(){
   updateKPIs();
-  renderClientes();
-  renderProyectos();
-  fillClientesSelect();          // <- asegura select inicial
-  fillProyectoSelectInTareas();
-  renderKanban();
-  renderAgenda();
+  renderClientes(); renderProyectos(); fillClientesSelect();
+  fillProyectoSelectInTareas(); renderKanban(); renderAgenda();
 }
 boot();
 
 // ---------- PWA ----------
-let deferredPrompt=null;
-const btnInstall=$("#btnInstall");
-window.addEventListener("beforeinstallprompt",(e)=>{
-  e.preventDefault(); deferredPrompt=e; btnInstall.hidden=false;
-});
-btnInstall.addEventListener("click", async ()=>{
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt(); await deferredPrompt.userChoice;
-  btnInstall.hidden=true; deferredPrompt=null;
-});
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register(`${BASE}service-worker.js`, {scope: BASE}).catch(console.error);
-}
+let deferredPrompt=null; const btnInstall=$("#btnInstall");
+window.addEventListener("beforeinstallprompt",(e)=>{ e.preventDefault(); deferredPrompt=e; btnInstall.hidden=false; });
+btnInstall.addEventListener("click", async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; btnInstall.hidden=true; deferredPrompt=null; });
+if("serviceWorker" in navigator){ navigator.serviceWorker.register(`${BASE}service-worker.js`, {scope: BASE}).catch(console.error); }

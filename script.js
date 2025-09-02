@@ -27,22 +27,34 @@ function agregarCliente() {
   const contacto = document.getElementById("contactoCliente").value.trim();
   const notas = document.getElementById("notasCliente").value.trim();
   const telefono = document.getElementById("telefonoCliente").value.trim();
-const email = document.getElementById("emailCliente").value.trim();
-const direccion = document.getElementById("direccionCliente").value.trim();
-const tipo = document.getElementById("tipoCliente").value;
-const categoria = document.getElementById("categoriaCliente").value.trim();
+  const email = document.getElementById("emailCliente").value.trim();
+  const direccion = document.getElementById("direccionCliente").value.trim();
+  const tipo = document.getElementById("tipoCliente").value;
+  const categoria = document.getElementById("categoriaCliente").value.trim();
 
-clientes.push({
-  id: Date.now(),
-  empresa,
-  contacto,
-  notas,
-  telefono,
-  email,
-  direccion,
-  tipo,
-  categoria
-});
+  if (!empresa) return;
+
+  const clientes = obtenerDatos("clientes"); // ← Aquí se define correctamente
+
+  clientes.push({
+    id: Date.now(),
+    empresa,
+    contacto,
+    notas,
+    telefono,
+    email,
+    direccion,
+    tipo,
+    categoria
+  });
+
+  guardarDatos("clientes", clientes);
+  mostrarClientes();
+  actualizarSelectorClientes();
+  actualizarResumen();
+  document.getElementById("form-cliente").reset();
+}
+
 
   if (!empresa) return;
   const clientes = obtenerDatos("clientes");

@@ -125,7 +125,7 @@ function clienteForm(c={}){
     {k:"tel",label:"Teléfono",type:"text",val:c.tel||""},
     {k:"dir",label:"Dirección",type:"text",val:c.dir||""},
     {k:"cp",label:"CP",type:"text",val:c.cp||""},
-    {k:"ciudad",label:"Ciudad",type:"text",val=c.ciudad||""},
+    {k:"ciudad",label:"Ciudad",type:"text",val: c.ciudad||""},
     {k:"pais",label:"País",type:"text",val:c.pais||""},
     {k:"estado",label:"Estado",type:"select",options:[["activo","Activo"],["inactivo","Inactivo"]],val:c.estado||"activo"},
     {k:"notas",label:"Notas",type:"textarea",val:c.notas||""}
@@ -285,7 +285,6 @@ document.addEventListener("click",(e)=>{
   const del = e.target?.dataset?.del;
   const edit = e.target?.dataset?.edit;
   if(del){
-    // puede ser tarea o agenda item o cliente/proyecto ya gestionados arriba
     const tIndex = state.tareas.findIndex(x=>x.id===del);
     if(tIndex>-1){ state.tareas.splice(tIndex,1); save(); renderKanban(); return; }
   }
@@ -399,7 +398,6 @@ function openModal(title, schema, onOK){
       el=document.createElement("input");
       el.type=f.type||"text";
       if(f.type==="number"){ el.step="0.01"; }
-      if(f.type==="date"||f.type==="time"){ /* default ok */ }
       el.value=f.val||"";
     }
     el.id="m-"+f.k; el.name=f.k;

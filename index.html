@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestión Zen</title>
   <meta name="description" content="Panel de control: clientes, proyectos, tareas y agenda." />
-  <meta name="theme-color" content="#0b6" />
+  <meta name="theme-color" content="#000" />
   <base href="/webaap/">
   <link rel="manifest" href="/webaap/manifest.json" />
   <link rel="stylesheet" href="/webaap/styles.css" />
@@ -20,11 +20,15 @@
       <button role="tab" class="tab" data-tab="tab-tareas">Tareas</button>
       <button role="tab" class="tab" data-tab="tab-agenda">Agenda</button>
       <button id="btnInstall" class="btn secondary small" hidden>Instalar</button>
+      <div id="authBar" class="auth">
+        <button id="btnLogin" class="btn small">Entrar</button>
+        <span id="userEmail" class="meta"></span>
+        <button id="btnLogout" class="btn secondary small" hidden>Salir</button>
+      </div>
     </nav>
   </header>
 
   <main id="main" class="container">
-    <!-- DASHBOARD -->
     <section id="tab-dashboard" class="panel active" aria-labelledby="dash-title">
       <h2 id="dash-title">Resumen</h2>
       <div class="grid-4">
@@ -36,23 +40,13 @@
       <div class="card mt">
         <h3>Kanban rápido</h3>
         <div class="kanban">
-          <div class="col" data-status="pendiente">
-            <h4>Pendiente</h4>
-            <div class="dropzone" id="kanban-pendiente"></div>
-          </div>
-          <div class="col" data-status="haciendo">
-            <h4>Haciendo</h4>
-            <div class="dropzone" id="kanban-haciendo"></div>
-          </div>
-          <div class="col" data-status="hecho">
-            <h4>Hecho</h4>
-            <div class="dropzone" id="kanban-hecho"></div>
-          </div>
+          <div class="col" data-status="pendiente"><h4>Pendiente</h4><div class="dropzone" id="kanban-pendiente"></div></div>
+          <div class="col" data-status="haciendo"><h4>Haciendo</h4><div class="dropzone" id="kanban-haciendo"></div></div>
+          <div class="col" data-status="hecho"><h4>Hecho</h4><div class="dropzone" id="kanban-hecho"></div></div>
         </div>
       </div>
     </section>
 
-    <!-- CLIENTES -->
     <section id="tab-clientes" class="panel" aria-labelledby="clientes-title">
       <h2 id="clientes-title">Clientes</h2>
       <form id="formCliente" class="card form-grid">
@@ -67,20 +61,17 @@
         <textarea id="cli-notas" name="notas" placeholder="Notas" rows="2"></textarea>
         <div class="row end">
           <select id="cli-estado" name="estado">
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
+            <option value="activo">Activo</option><option value="inactivo">Inactivo</option>
           </select>
           <button class="btn">Añadir cliente</button>
         </div>
       </form>
-
       <div class="card">
         <input id="filtro-clientes" class="w100" placeholder="Filtrar por nombre o NIF..." />
         <ul id="lista-clientes" class="list mt"></ul>
       </div>
     </section>
 
-    <!-- PROYECTOS -->
     <section id="tab-proyectos" class="panel" aria-labelledby="proy-title">
       <h2 id="proy-title">Proyectos</h2>
       <form id="formProyecto" class="card form-grid">
@@ -92,56 +83,35 @@
         <textarea id="proy-desc" name="desc" placeholder="Descripción" rows="2"></textarea>
         <div class="row end">
           <select id="proy-estado" name="estado">
-            <option value="abierto">Abierto</option>
-            <option value="en_progreso">En progreso</option>
-            <option value="cerrado">Cerrado</option>
+            <option value="abierto">Abierto</option><option value="en_progreso">En progreso</option><option value="cerrado">Cerrado</option>
           </select>
           <button class="btn">Añadir proyecto</button>
         </div>
       </form>
-
-      <div class="card">
-        <ul id="lista-proyectos" class="list"></ul>
-      </div>
+      <div class="card"><ul id="lista-proyectos" class="list"></ul></div>
     </section>
 
-    <!-- TAREAS -->
     <section id="tab-tareas" class="panel" aria-labelledby="tareas-title">
       <h2 id="tareas-title">Tareas</h2>
       <form id="formTarea" class="card form-grid">
-        <select id="tarea-proyecto" name="proyectoId">
-          <option value="">— Tarea libre —</option>
-        </select>
+        <select id="tarea-proyecto" name="proyectoId"><option value="">— Tarea libre —</option></select>
         <input id="tarea-titulo" name="titulo" required placeholder="Título de la tarea" />
         <input id="tarea-fecha" type="date" name="fecha" />
         <textarea id="tarea-desc" name="desc" placeholder="Notas" rows="2"></textarea>
         <div class="row end">
           <select id="tarea-estado" name="estado">
-            <option value="pendiente">Pendiente</option>
-            <option value="haciendo">Haciendo</option>
-            <option value="hecho">Hecho</option>
+            <option value="pendiente">Pendiente</option><option value="haciendo">Haciendo</option><option value="hecho">Hecho</option>
           </select>
           <button class="btn">Añadir tarea</button>
         </div>
       </form>
-
       <div class="kanban">
-        <div class="col" data-status="pendiente">
-          <h4>Pendiente</h4>
-          <div class="dropzone" id="list-pendiente"></div>
-        </div>
-        <div class="col" data-status="haciendo">
-          <h4>Haciendo</h4>
-          <div class="dropzone" id="list-haciendo"></div>
-        </div>
-        <div class="col" data-status="hecho">
-          <h4>Hecho</h4>
-          <div class="dropzone" id="list-hecho"></div>
-        </div>
+        <div class="col" data-status="pendiente"><h4>Pendiente</h4><div class="dropzone" id="list-pendiente"></div></div>
+        <div class="col" data-status="haciendo"><h4>Haciendo</h4><div class="dropzone" id="list-haciendo"></div></div>
+        <div class="col" data-status="hecho"><h4>Hecho</h4><div class="dropzone" id="list-hecho"></div></div>
       </div>
     </section>
 
-    <!-- AGENDA -->
     <section id="tab-agenda" class="panel" aria-labelledby="agenda-title">
       <h2 id="agenda-title">Agenda</h2>
       <form id="formAgenda" class="card form-grid">
@@ -149,22 +119,15 @@
         <input id="ag-fecha" name="fecha" type="date" required />
         <input id="ag-hora" name="hora" type="time" />
         <textarea id="ag-notas" name="notas" placeholder="Notas" rows="2"></textarea>
-        <div class="row end">
-          <button class="btn">Añadir evento</button>
-        </div>
+        <div class="row end"><button class="btn">Añadir evento</button></div>
       </form>
-
-      <div class="card">
-        <div class="agenda-grid" id="agenda-grid"></div>
-      </div>
+      <div class="card"><div class="agenda-grid" id="agenda-grid"></div></div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <small>Local-first. PWA.</small>
-  </footer>
+  <footer class="site-footer"><small>Local-first. PWA.</small></footer>
 
-  <!-- Modal genérico para edición -->
+  <!-- Modal edición -->
   <dialog id="modal">
     <form method="dialog" class="modal">
       <h3 id="modal-title">Editar</h3>
@@ -176,6 +139,23 @@
     </form>
   </dialog>
 
-  <script defer src="/webaap/script.js"></script>
+  <!-- Modal login -->
+  <dialog id="authDialog">
+    <form method="dialog" class="modal">
+      <h3>Acceso</h3>
+      <div class="form-grid">
+        <input type="email" id="authEmail" placeholder="Email" required />
+        <input type="password" id="authPass" placeholder="Contraseña" required />
+      </div>
+      <div class="row end mt">
+        <button class="btn secondary" value="cancel">Cancelar</button>
+        <button id="btnDoLogin" class="btn" value="ok">Entrar</button>
+      </div>
+      <p class="meta">Si no existe, se crea la cuenta.</p>
+    </form>
+  </dialog>
+
+  <!-- Usa módulos ESM -->
+  <script type="module" src="/webaap/script.js"></script>
 </body>
 </html>
